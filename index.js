@@ -6,6 +6,7 @@ const cors = require('cors');
 const port = process.env.PORT;
 const routes = require('./routes');
 
+app.use(express.static('public'));
 app.use(bodyParser.json());
 app.use(cors());
 

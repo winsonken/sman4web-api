@@ -1,11 +1,40 @@
 const express = require('express');
 const app = express();
+const { verifyToken } = require('../middleware/verifyToken');
 
+const auth = require('./auth');
 const angkatan = require('./angkatan');
 const jurusan = require('./jurusan');
+const siswa = require('./siswa');
+const guru = require('./guru');
+const tendik = require('./tendik');
+const ppdb = require('./ppdb');
+const tahunAjaran = require('./tahun-ajaran');
+const kelas = require('./kelas');
+const prestasi = require('./prestasi');
+const pelanggaran = require('./pelanggaran');
+const kelasSiswa = require('./kelas-siswa');
+const rapotSiswa = require('./rapot-siswa');
+const modul = require('./modul');
+const role = require('./role');
+const modulUser = require('./modul-user');
 
 const api = '/api/v1';
-app.use(api, angkatan);
-app.use(api, jurusan);
+app.use(api, auth);
+app.use(api, verifyToken, angkatan);
+app.use(api, verifyToken, jurusan);
+app.use(api, verifyToken, siswa);
+app.use(api, verifyToken, guru);
+app.use(api, verifyToken, tendik);
+app.use(api, verifyToken, ppdb);
+app.use(api, verifyToken, tahunAjaran);
+app.use(api, verifyToken, kelas);
+app.use(api, verifyToken, prestasi);
+app.use(api, verifyToken, pelanggaran);
+app.use(api, verifyToken, kelasSiswa);
+app.use(api, verifyToken, rapotSiswa);
+app.use(api, verifyToken, modul);
+app.use(api, verifyToken, role);
+app.use(api, verifyToken, modulUser);
 
 module.exports = app;

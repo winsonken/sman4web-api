@@ -6,17 +6,29 @@ const idGenerator = crypto.randomBytes(16).toString('hex');
 const getAngkatan = async (req, res) => {
   const no_angkatan = req.query.no || '';
   const tahun = req.query.tahun || '';
-  const status_angkatan = req.query.status || '';
+  const status = req.query.status || '';
   const search = req.query.q || '';
   const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
-  const limit =
-    Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
+  const limit = Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 3;
 
   const payload = {
     no_angkatan: no_angkatan,
     tahun: tahun,
-    status_angkatan: status_angkatan,
+    status_angkatan: status,
   };
+
+  // const payload = {
+  //   no_angkatan: no_angkatan,
+  //   tahun: tahun,
+  //   status_angkatan:
+  //     '0'.startsWith(status) || 'belum dimulai'.startsWith(status)
+  //       ? '0'
+  //       : '1'.startsWith(status) || 'aktif'.startsWith(status)
+  //       ? '1'
+  //       : '2'.startsWith(status) || 'lulus'.startsWith(status)
+  //       ? '2'
+  //       : null,
+  // };
 
   const statement = await query(
     'SELECT id_angkatan, no_angkatan, tahun, jumlah_siswa, siswa_lulus, status_angkatan FROM angkatan ORDER BY no_angkatan DESC',
@@ -134,6 +146,32 @@ const updateAngkatan = async (req, res) => {
     return res.status(400).json({ message: message, status: 400 });
   }
 
+  const [checkAngkatan] = await query(
+    'SELECT status_angkatan FROM angkatan WHERE id_angkatan = ?',
+    [id_angkatan]
+  );
+
+  if (checkAngkatan.status_angkatan == 1 && status_angkatan == 0) {
+    return res
+      .status(400)
+      .json({ message: 'Angkatan sudah dimulai', status: 400 });
+  }
+
+  if (checkAngkatan.status_angkatan == 0 && status_angkatan == 2) {
+    return res
+      .status(400)
+      .json({ message: 'Angkatan belum dimulai', status: 400 });
+  }
+
+  if (
+    checkAngkatan.status_angkatan == 2 &&
+    (status_angkatan == 0 || status_angkatan == 1)
+  ) {
+    return res
+      .status(400)
+      .json({ message: 'Angkatan sudah lulus', status: 400 });
+  }
+
   const statement = await query(
     `UPDATE angkatan SET no_angkatan = ?, tahun = ?, status_angkatan = ? WHERE id_angkatan = ?`,
     [no_angkatan, tahun, status_angkatan, id_angkatan]
@@ -179,6 +217,58 @@ const deleteAngkatan = async (req, res) => {
   }
 };
 
+const updateMulaiAngkatan = async (req, res) => {
+  const { id_angkatan } = req.body;
+
+  const status_angkatan = 1;
+
+  const statement = await query(
+    `UPDATE angkatan SET status_angkatan = ? WHERE id_angkatan = ?`,
+    [status_angkatan, id_angkatan]
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Angkatan gagal dimulai'
+        : 'Angkatan berhasil dimulai';
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+const updateLulusAngkatan = async (req, res) => {
+  const { id_angkatan } = req.body;
+
+  const status_angkatan = 2;
+
+  const statement = await query(
+    `UPDATE angkatan SET status_angkatan = ? WHERE id_angkatan = ?`,
+    [status_angkatan, id_angkatan]
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Angkatan gagal diluluskan'
+        : 'Angkatan berhasil diluluskan';
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
 const updateJumlahSiswa = async (req, res) => {
   const { jumlah_siswa, id_angkatan } = req.body;
   const statement = await query(
@@ -209,18 +299,6 @@ const updateSiswaLulus = async (req, res) => {
     [siswa_lulus, id_angkatan]
   );
 
-  const checkAngkatan = await query(
-    'SELECT status_angkatan FROM angkatan WHERE id_angkatan = ?',
-    [id_angkatan]
-  );
-
-  // Jika status_angkatan tidak 2 (lulus)
-  if (checkAngkatan !== 2) {
-    return res
-      .status(400)
-      .json({ message: 'Belum waktunya lulus', status: 400 });
-  }
-
   try {
     const result = statement;
     const message =
@@ -242,6 +320,8 @@ module.exports = {
   createAngkatan,
   updateAngkatan,
   deleteAngkatan,
+  updateMulaiAngkatan,
+  updateLulusAngkatan,
   updateJumlahSiswa,
   updateSiswaLulus,
 };
