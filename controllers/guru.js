@@ -133,6 +133,7 @@ const createGuru = async (req, res) => {
         : status_kepegawaian === ''
         ? 'Status kepegawaian ortu harus diisi'
         : '';
+    req.file && fs.unlinkSync(req.file.path);
     return res.status(400).json({ message: message, status: 400 });
   }
 
@@ -297,6 +298,7 @@ const updateGuru = async (req, res) => {
         : role === ''
         ? 'Role harus diisi'
         : '';
+    req.file && fs.unlinkSync(req.file.path);
     return res.status(400).json({ message: message, status: 400 });
   }
 

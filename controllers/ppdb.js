@@ -132,6 +132,7 @@ const createPpdb = async (req, res) => {
         : tahun_ajaran === ''
         ? 'Tahun ajaran harus diisi'
         : '';
+    req.file && fs.unlinkSync(req.file.path);
     return res.status(400).json({ message: message, status: 400 });
   }
 
@@ -294,6 +295,7 @@ const updatePpdb = async (req, res) => {
         : tahun_ajaran === ''
         ? 'Tahun ajaran harus diisi'
         : '';
+    req.file && fs.unlinkSync(req.file.path);
     return res.status(400).json({ message: message, status: 400 });
   }
 

@@ -1,7 +1,9 @@
 const query = require('../config/database');
 const pagination = require('../middleware/pagination');
 const crypto = require('crypto');
-const idGenerator = crypto.randomBytes(16).toString('hex');
+const idGenerator = () => {
+  return crypto.randomBytes(16).toString('hex');
+};
 
 const getAngkatan = async (req, res) => {
   const no_angkatan = req.query.no || '';
@@ -9,7 +11,8 @@ const getAngkatan = async (req, res) => {
   const status = req.query.status || '';
   const search = req.query.q || '';
   const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 3;
+  const limit =
+    Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
 
   const payload = {
     no_angkatan: no_angkatan,
@@ -74,7 +77,7 @@ const getAngkatan = async (req, res) => {
 const createAngkatan = async (req, res) => {
   const { no_angkatan, tahun } = req.body;
 
-  const id_angkatan = idGenerator;
+  const id_angkatan = idGenerator();
   const jumlah_siswa = null;
   const siswa_lulus = null;
   const status_angkatan = 0;

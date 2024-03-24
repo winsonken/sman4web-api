@@ -32,7 +32,6 @@ const getTendik = async (req, res) => {
       payload[key] == '' ? object : object[key] == payload[key]
     )
   );
-  console.log(filterParameter);
 
   const filterSearch = filterParameter.filter((object) =>
     search == ''
@@ -78,12 +77,13 @@ const createTendik = async (req, res) => {
     agama,
     status_kawin,
     status_kepegawaian,
+    role,
   } = req.body;
 
   const id_tendik = idGenerator;
   const username = email;
   const password = tanggal_lahir.split('-').join('');
-  const role = 'dcef15809d5686e1925c12623b595cfb';
+  // const role = 'dcef15809d5686e1925c12623b595cfb';
   const status_tendik = 1;
 
   const salt = await bcryptjs.genSalt(12);
@@ -102,7 +102,8 @@ const createTendik = async (req, res) => {
     tanggal_lahir === '' ||
     agama === '' ||
     status_kawin === '' ||
-    status_kepegawaian === ''
+    status_kepegawaian === '' ||
+    role === ''
   ) {
     const message =
       nama === ''
@@ -131,7 +132,10 @@ const createTendik = async (req, res) => {
         ? 'Status kawin harus diisi'
         : status_kepegawaian === ''
         ? 'Status kepegawaian ortu harus diisi'
+        : role === ''
+        ? 'Role harus diisi'
         : '';
+    req.file && fs.unlinkSync(req.file.path);
     return res.status(400).json({ message: message, status: 400 });
   }
 
@@ -158,7 +162,7 @@ const createTendik = async (req, res) => {
   }
 
   const checkNoTendikExist = await query(
-    'SELECT id_tendik FROM tendik WHERE no_tendik AND id_tendik != ?',
+    'SELECT id_tendik FROM tendik WHERE no_tendik = ? AND id_tendik != ?',
     [no_tendik, id_tendik]
   );
 
@@ -166,10 +170,10 @@ const createTendik = async (req, res) => {
     req.file && fs.unlinkSync(req.file.path);
     return res
       .status(400)
-      .json({ message: 'NIPD sudah terdaftar', status: 400 });
+      .json({ message: 'No tendik sudah terdaftar', status: 400 });
   }
   const checkEmailExist = await query(
-    'SELECT id_tendik FROM tendik WHERE email AND id_tendik != ? ',
+    'SELECT id_tendik FROM tendik WHERE email = ? AND id_tendik != ? ',
     [email, id_tendik]
   );
 
@@ -296,6 +300,7 @@ const updateTendik = async (req, res) => {
         : role === ''
         ? 'Role harus diisi'
         : '';
+    req.file && fs.unlinkSync(req.file.path);
     return res.status(400).json({ message: message, status: 400 });
   }
 

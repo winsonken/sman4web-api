@@ -129,6 +129,7 @@ const createSiswa = async (req, res) => {
         : angkatan === ''
         ? 'Angkatan harus diisi'
         : '';
+    req.file && fs.unlinkSync(req.file.path);
     return res.status(400).json({ message: message, status: 400 });
   }
 
@@ -309,6 +310,7 @@ const updateSiswa = async (req, res) => {
         : angkatan === ''
         ? 'Angkatan harus diisi'
         : '';
+    req.file && fs.unlinkSync(req.file.path);
     return res.status(400).json({ message: message, status: 400 });
   }
 

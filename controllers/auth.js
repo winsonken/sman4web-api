@@ -112,11 +112,11 @@ const login = async (req, res) => {
   );
 
   const statement =
-    statementSiswa.length > 0
+    statementSiswa?.length > 0
       ? statementSiswa[0]
-      : statementGuru.length > 0
+      : statementGuru?.length > 0
       ? statementGuru[0]
-      : statementTendik.length > 0
+      : statementTendik?.length > 0
       ? statementTendik[0]
       : null;
 

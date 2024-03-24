@@ -1,7 +1,9 @@
 const query = require('../config/database');
 const pagination = require('../middleware/pagination');
 const crypto = require('crypto');
-const idGenerator = crypto.randomBytes(16).toString('hex');
+const idGenerator = () => {
+  return crypto.randomBytes(16).toString('hex');
+};
 
 const getTahunAjaran = async (req, res) => {
   const status = req.query.status || '';
@@ -26,7 +28,7 @@ const getTahunAjaran = async (req, res) => {
   // };
 
   const statement = await query(
-    'SELECT id_tahun_ajaran, tahun_mulai_ajaran, tahun_akhir_ajaran, mulai_periode_ganjil, akhir_periode_ganjil, mulai_periode_genap, akhir_periode_genap, status_tahun_ajaran FROM tahun_ajaran ORDER BY status_tahun_ajaran ASC',
+    'SELECT id_tahun_ajaran, tahun_mulai_ajaran, tahun_akhir_ajaran, DATE_FORMAT(mulai_periode_ganjil, "%Y-%m-%d") AS mulai_periode_ganjil, DATE_FORMAT(akhir_periode_ganjil, "%Y-%m-%d") AS akhir_periode_ganjil, DATE_FORMAT(mulai_periode_genap, "%Y-%m-%d") AS mulai_periode_genap, DATE_FORMAT(akhir_periode_genap, "%Y-%m-%d") AS akhir_periode_genap, status_tahun_ajaran FROM tahun_ajaran ORDER BY status_tahun_ajaran ASC',
     []
   );
 
@@ -41,7 +43,7 @@ const getTahunAjaran = async (req, res) => {
       ? object
       : object.tahun_mulai_ajaran.toString().startsWith(search) ||
         object.tahun_akhir_ajaran.toString().startsWith(search) ||
-        `${object.tahun_mulai_ajaran}/${object.tahun_akhir_ajaran}`.startsWith(
+        `${object.tahun_mulai_ajaran}-${object.tahun_akhir_ajaran}`.startsWith(
           search
         )
   );
@@ -77,7 +79,7 @@ const createTahunAjaran = async (req, res) => {
     akhir_periode_genap,
   } = req.body;
 
-  const id_tahun_ajaran = idGenerator;
+  const id_tahun_ajaran = idGenerator();
   const status_tahun_ajaran = 0;
 
   if (
