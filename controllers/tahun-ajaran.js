@@ -233,6 +233,20 @@ const updateTahunAjaran = async (req, res) => {
     });
   }
 
+  // Jika ada tahun ajaran yang sudah dimulai
+  const status_tahun_ajaran_mulai = 1;
+  const checkTahunAjaranMulai = await query(
+    'SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status_tahun_ajaran = ?',
+    status_tahun_ajaran_mulai
+  );
+
+  if (status_tahun_ajaran == 1 && checkTahunAjaranMulai.length > 0) {
+    return res.status(400).json({
+      message: 'Tahun ajaran sebelumnya harus diselesaikan terlebih dahulu',
+      status: 400,
+    });
+  }
+
   const statement = await query(
     `UPDATE tahun_ajaran SET tahun_mulai_ajaran = ?, tahun_akhir_ajaran = ?, mulai_periode_ganjil = ?, akhir_periode_ganjil = ?, mulai_periode_genap = ?, akhir_periode_genap = ?, status_tahun_ajaran = ? WHERE id_tahun_ajaran = ?`,
     [
