@@ -9,6 +9,8 @@ const verifyToken = async (req, res, next) => {
 
   try {
     const data = jwt.verify(token, process.env.SECRET_ACCESS_TOKEN);
+    req.userId = data.id;
+    req.userRole = data.role;
     next();
   } catch (error) {
     return res

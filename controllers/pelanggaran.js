@@ -17,7 +17,7 @@ const getPelanggaran = async (req, res) => {
   };
 
   const statement = await query(
-    'SELECT id_pelanggaran, nama_pelanggaran, DATE_FORMAT(tanggal_pelanggaran, "%Y-%m-%d") AS tanggal_pelanggaran, siswa.nama AS nama_siswa FROM pelanggaran LEFT JOIN siswa ON pelanggaran.siswa = siswa.id_siswa',
+    'SELECT id_pelanggaran, nama_pelanggaran, DATE_FORMAT(tanggal_pelanggaran, "%Y-%m-%d") AS tanggal_pelanggaran, siswa.nama AS nama_siswa, siswa.nipd FROM pelanggaran LEFT JOIN siswa ON pelanggaran.siswa = siswa.id_siswa',
     []
   );
 

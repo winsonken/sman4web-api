@@ -13,11 +13,11 @@ const getPrestasi = async (req, res) => {
     Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
 
   const payload = {
-    nama_siswa: siswa,
+    id_siswa: siswa,
   };
 
   const statement = await query(
-    'SELECT id_prestasi, nama_prestasi, jenis_prestasi, tahun_prestasi, siswa.nama AS nama_siswa FROM prestasi_siswa LEFT JOIN siswa ON prestasi_siswa.siswa = siswa.id_siswa',
+    'SELECT id_prestasi, nama_prestasi, jenis_prestasi, tahun_prestasi, siswa.nama AS nama_siswa, siswa.id_siswa, siswa.nipd FROM prestasi_siswa LEFT JOIN siswa ON prestasi_siswa.siswa = siswa.id_siswa',
     []
   );
 
