@@ -16,27 +16,33 @@ const getTahunAjaran = async (req, res) => {
     status_tahun_ajaran: status,
   };
 
-  // const payload = {
-  //   status_tahun_ajaran:
-  //     '0'.startsWith(status) || 'belum dimulai'.startsWith(status)
-  //       ? '0'
-  //       : '1'.startsWith(status) || 'dimulai'.startsWith(status)
-  //       ? '1'
-  //       : '2'.startsWith(status) || 'berakhir'.startsWith(status)
-  //       ? '2'
-  //       : null,
-  // };
+  const getStatus = status?.split(',');
+  const statusFirst = getStatus[0] || '';
+  const statusSecond = getStatus[1] || '';
 
   const statement = await query(
     'SELECT id_tahun_ajaran, tahun_mulai_ajaran, tahun_akhir_ajaran, DATE_FORMAT(mulai_periode_ganjil, "%Y-%m-%d") AS mulai_periode_ganjil, DATE_FORMAT(akhir_periode_ganjil, "%Y-%m-%d") AS akhir_periode_ganjil, DATE_FORMAT(mulai_periode_genap, "%Y-%m-%d") AS mulai_periode_genap, DATE_FORMAT(akhir_periode_genap, "%Y-%m-%d") AS akhir_periode_genap, status_tahun_ajaran FROM tahun_ajaran ORDER BY status_tahun_ajaran ASC',
     []
   );
 
-  const filterParameter = statement.filter((object) =>
-    Object.keys(payload).every((key) =>
-      payload[key] == '' ? object : object[key] == payload[key]
-    )
-  );
+  // const filterParameter = statement.filter((object) =>
+  //   Object.keys(payload).every((key) =>
+  //     payload[key] == '' ? object : object[key] == payload[key]
+  //   )
+
+  // );
+
+  // Filter by status
+  const filterParameter =
+    status == ''
+      ? statement
+      : status.length == 3
+      ? statement.filter(
+          (e) =>
+            e.status_tahun_ajaran == statusFirst ||
+            e.status_tahun_ajaran == statusSecond
+        )
+      : statement.filter((e) => e.status_tahun_ajaran == status);
 
   const filterSearch = filterParameter.filter((object) =>
     search == ''
@@ -236,8 +242,8 @@ const updateTahunAjaran = async (req, res) => {
   // Jika ada tahun ajaran yang sudah dimulai
   const status_tahun_ajaran_mulai = 1;
   const checkTahunAjaranMulai = await query(
-    'SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status_tahun_ajaran = ?',
-    status_tahun_ajaran_mulai
+    'SELECT id_tahun_ajaran FROM tahun_ajaran WHERE status_tahun_ajaran = ? AND id_tahun_ajaran != ?',
+    [status_tahun_ajaran_mulai, id_tahun_ajaran]
   );
 
   if (status_tahun_ajaran == 1 && checkTahunAjaranMulai.length > 0) {
