@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   getTahunAjaran,
+  getTahunAjaranBerakhir,
   createTahunAjaran,
   updateTahunAjaran,
   deleteTahunAjaran,
@@ -11,6 +12,7 @@ const {
 const app = express();
 
 app.get('/tahun-ajaran', getTahunAjaran);
+app.get('/tahun-ajaran/berakhir', getTahunAjaranBerakhir);
 app.post('/tahun-ajaran', createTahunAjaran);
 app.put('/tahun-ajaran', updateTahunAjaran);
 app.delete('/tahun-ajaran/:id', deleteTahunAjaran);

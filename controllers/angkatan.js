@@ -34,7 +34,63 @@ const getAngkatan = async (req, res) => {
   // };
 
   const statement = await query(
-    'SELECT id_angkatan, no_angkatan, tahun, jumlah_siswa, siswa_lulus, status_angkatan FROM angkatan ORDER BY no_angkatan DESC',
+    'SELECT id_angkatan, no_angkatan, tahun, jumlah_siswa, siswa_lulus, status_angkatan FROM angkatan WHERE status_angkatan != 2 ORDER BY no_angkatan DESC',
+    []
+  );
+
+  const filterParameter = statement.filter((object) =>
+    Object.keys(payload).every((key) =>
+      payload[key] == '' ? object : object[key] == payload[key]
+    )
+  );
+
+  const filterSearch = filterParameter.filter(
+    (object) =>
+      search == ''
+        ? object
+        : object.no_angkatan.toString().startsWith(search) ||
+          object.tahun.toString().startsWith(search)
+    // object.status_angkatan.toString().startsWith(search)
+  );
+
+  try {
+    const result = Object.keys(payload).length < 1 ? statement : filterSearch;
+    const message =
+      result.length >= 0
+        ? 'Angkatan berhasil ditemukan'
+        : 'Angkatan tidak ditemukan';
+    const status = result.length >= 0 ? 200 : 400;
+
+    const paginationResult = pagination(result, page, limit);
+
+    return res.status(status).json({
+      message: message,
+      status: status,
+      data: paginationResult?.data,
+      pagination: paginationResult?.pagination,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+const getAngkatanLulus = async (req, res) => {
+  const no_angkatan = req.query.no || '';
+  const tahun = req.query.tahun || '';
+  const status = req.query.status || '';
+  const search = req.query.q || '';
+  const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
+  const limit =
+    Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
+
+  const payload = {
+    no_angkatan: no_angkatan,
+    tahun: tahun,
+    status_angkatan: status,
+  };
+
+  const statement = await query(
+    'SELECT id_angkatan, no_angkatan, tahun, jumlah_siswa, siswa_lulus, status_angkatan FROM angkatan WHERE status_angkatan = 2 ORDER BY no_angkatan DESC',
     []
   );
 
@@ -320,6 +376,7 @@ const updateSiswaLulus = async (req, res) => {
 
 module.exports = {
   getAngkatan,
+  getAngkatanLulus,
   createAngkatan,
   updateAngkatan,
   deleteAngkatan,

@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   getAngkatan,
+  getAngkatanLulus,
   createAngkatan,
   updateAngkatan,
   deleteAngkatan,
@@ -14,6 +15,7 @@ const app = express();
 const { verifyRole } = require('../middleware/verifyRole');
 
 app.get('/angkatan', getAngkatan);
+app.get('/angkatan/lulus', getAngkatanLulus);
 app.post('/angkatan', createAngkatan);
 app.patch('/angkatan', updateAngkatan);
 app.delete('/angkatan/:id', deleteAngkatan);
