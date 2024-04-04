@@ -16,12 +16,12 @@ const getRapotSiswa = async (req, res) => {
     Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
 
   const payload = {
-    nama_siswa: siswa,
+    id_siswa: siswa,
     status_tahun_ajaran: tahun_ajaran,
   };
 
   const statement = await query(
-    'SELECT id_rapot, rapot_ganjil_awal, rapot_ganjil_akhir, rapot_genap_awal, rapot_genap_akhir, siswa.nama AS nama_siswa, siswa.nipd, tahun_ajaran.tahun_mulai_ajaran, tahun_ajaran.tahun_akhir_ajaran FROM rapot_siswa LEFT JOIN siswa ON rapot_siswa.siswa = siswa.id_siswa LEFT JOIN tahun_ajaran ON rapot_siswa.tahun_ajaran = tahun_ajaran.id_tahun_ajaran',
+    'SELECT id_rapot, rapot_ganjil_awal, rapot_ganjil_akhir, rapot_genap_awal, rapot_genap_akhir, siswa.nama AS nama_siswa, siswa.nipd, siswa.id_siswa, tahun_ajaran.tahun_mulai_ajaran, tahun_ajaran.tahun_akhir_ajaran FROM rapot_siswa LEFT JOIN siswa ON rapot_siswa.siswa = siswa.id_siswa LEFT JOIN tahun_ajaran ON rapot_siswa.tahun_ajaran = tahun_ajaran.id_tahun_ajaran',
     []
   );
 

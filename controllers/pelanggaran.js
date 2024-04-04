@@ -13,11 +13,11 @@ const getPelanggaran = async (req, res) => {
     Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
 
   const payload = {
-    nama_siswa: siswa,
+    id_siswa: siswa,
   };
 
   const statement = await query(
-    'SELECT id_pelanggaran, nama_pelanggaran, DATE_FORMAT(tanggal_pelanggaran, "%Y-%m-%d") AS tanggal_pelanggaran, siswa.nama AS nama_siswa, siswa.nipd FROM pelanggaran LEFT JOIN siswa ON pelanggaran.siswa = siswa.id_siswa',
+    'SELECT id_pelanggaran, jenis_pelanggaran, DATE_FORMAT(tanggal_pelanggaran, "%Y-%m-%d") AS tanggal_pelanggaran, siswa.nama AS nama_siswa, siswa.nipd, siswa.id_siswa FROM pelanggaran LEFT JOIN siswa ON pelanggaran.siswa = siswa.id_siswa',
     []
   );
 
@@ -55,14 +55,14 @@ const getPelanggaran = async (req, res) => {
 };
 
 const createPelanggaran = async (req, res) => {
-  const { nama_pelanggaran, tanggal_pelanggaran, siswa } = req.body;
+  const { jenis_pelanggaran, tanggal_pelanggaran, siswa } = req.body;
 
-  const id_prestasi = idGenerator();
+  const id_pelanggaran = idGenerator();
 
-  if (nama_pelanggaran === '' || tanggal_pelanggaran === '' || siswa === '') {
+  if (jenis_pelanggaran === '' || tanggal_pelanggaran === '' || siswa === '') {
     const message =
-      nama_pelanggaran === ''
-        ? 'Nama pelanggaran harus diisi'
+      jenis_pelanggaran === ''
+        ? 'Jenis pelanggaran harus diisi'
         : tanggal_pelanggaran === ''
         ? 'Tanggal pelanggaran harus diisi'
         : siswa === ''
@@ -72,8 +72,8 @@ const createPelanggaran = async (req, res) => {
   }
 
   const statement = await query(
-    'INSERT INTO pelanggaran (id_pelanggaran, nama_pelanggaran, tanggal_pelanggaran, siswa) VALUES (?, ?, ?, ?)',
-    [id_prestasi, nama_pelanggaran, tanggal_pelanggaran, siswa]
+    'INSERT INTO pelanggaran (id_pelanggaran, jenis_pelanggaran, tanggal_pelanggaran, siswa) VALUES (?, ?, ?, ?)',
+    [id_pelanggaran, jenis_pelanggaran, tanggal_pelanggaran, siswa]
   );
 
   try {
@@ -81,8 +81,8 @@ const createPelanggaran = async (req, res) => {
 
     const message =
       result.affectedRows < 1
-        ? 'Prestasi gagal ditambahkan'
-        : 'Prestasi berhasil ditambahkan';
+        ? 'Pelanggaran gagal ditambahkan'
+        : 'Pelanggaran berhasil ditambahkan';
     const status = result.affectedRows < 1 ? 400 : 201;
     return res.status(status).json({
       message: message,
@@ -95,13 +95,13 @@ const createPelanggaran = async (req, res) => {
 };
 
 const updatePelanggaran = async (req, res) => {
-  const { id_pelanggaran, nama_pelanggaran, tanggal_pelanggaran, siswa } =
+  const { id_pelanggaran, jenis_pelanggaran, tanggal_pelanggaran, siswa } =
     req.body;
 
-  if (nama_pelanggaran === '' || tanggal_pelanggaran === '' || siswa === '') {
+  if (jenis_pelanggaran === '' || tanggal_pelanggaran === '' || siswa === '') {
     const message =
-      nama_pelanggaran === ''
-        ? 'Nama pelanggaran harus diisi'
+      jenis_pelanggaran === ''
+        ? 'Jenis pelanggaran harus diisi'
         : tanggal_pelanggaran === ''
         ? 'Tanggal pelanggaran harus diisi'
         : siswa === ''
@@ -111,8 +111,8 @@ const updatePelanggaran = async (req, res) => {
   }
 
   const statement = await query(
-    'UPDATE pelanggaran SET nama_pelanggaran = ?, tanggal_pelanggaran = ?, siswa = ? WHERE id_pelanggaran = ?',
-    [nama_pelanggaran, tanggal_pelanggaran, siswa, id_pelanggaran]
+    'UPDATE pelanggaran SET jenis_pelanggaran = ?, tanggal_pelanggaran = ?, siswa = ? WHERE id_pelanggaran = ?',
+    [jenis_pelanggaran, tanggal_pelanggaran, siswa, id_pelanggaran]
   );
 
   try {

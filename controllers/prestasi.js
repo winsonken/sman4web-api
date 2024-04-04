@@ -17,7 +17,7 @@ const getPrestasi = async (req, res) => {
   };
 
   const statement = await query(
-    'SELECT id_prestasi, nama_prestasi, jenis_prestasi, tahun_prestasi, siswa.nama AS nama_siswa, siswa.id_siswa, siswa.nipd FROM prestasi_siswa LEFT JOIN siswa ON prestasi_siswa.siswa = siswa.id_siswa',
+    'SELECT id_prestasi, nama_prestasi, jenis_prestasi, DATE_FORMAT(tanggal_prestasi, "%Y-%m-%d") AS tanggal_prestasi, siswa.nama AS nama_siswa, siswa.id_siswa, siswa.nipd FROM prestasi_siswa LEFT JOIN siswa ON prestasi_siswa.siswa = siswa.id_siswa',
     []
   );
 
@@ -55,14 +55,14 @@ const getPrestasi = async (req, res) => {
 };
 
 const createPrestasi = async (req, res) => {
-  const { nama_prestasi, jenis_prestasi, tahun_prestasi, siswa } = req.body;
+  const { nama_prestasi, jenis_prestasi, tanggal_prestasi, siswa } = req.body;
 
   const id_prestasi = idGenerator();
 
   if (
     nama_prestasi === '' ||
     jenis_prestasi === '' ||
-    tahun_prestasi === '' ||
+    tanggal_prestasi === '' ||
     siswa === ''
   ) {
     const message =
@@ -70,8 +70,8 @@ const createPrestasi = async (req, res) => {
         ? 'Nama prestasi harus diisi'
         : jenis_prestasi === ''
         ? 'Jenis prestasi harus diisi'
-        : tahun_prestasi === ''
-        ? 'Tahun prestasi harus diisi'
+        : tanggal_prestasi === ''
+        ? 'Tanggal prestasi harus diisi'
         : siswa === ''
         ? 'Nama siswa harus diisi'
         : '';
@@ -79,8 +79,8 @@ const createPrestasi = async (req, res) => {
   }
 
   const statement = await query(
-    'INSERT INTO prestasi_siswa (id_prestasi, nama_prestasi, jenis_prestasi, tahun_prestasi, siswa) VALUES (?, ?, ?, ?, ?)',
-    [id_prestasi, nama_prestasi, jenis_prestasi, tahun_prestasi, siswa]
+    'INSERT INTO prestasi_siswa (id_prestasi, nama_prestasi, jenis_prestasi, tanggal_prestasi, siswa) VALUES (?, ?, ?, ?, ?)',
+    [id_prestasi, nama_prestasi, jenis_prestasi, tanggal_prestasi, siswa]
   );
 
   try {
@@ -102,13 +102,18 @@ const createPrestasi = async (req, res) => {
 };
 
 const updatePrestasi = async (req, res) => {
-  const { id_prestasi, nama_prestasi, jenis_prestasi, tahun_prestasi, siswa } =
-    req.body;
+  const {
+    id_prestasi,
+    nama_prestasi,
+    jenis_prestasi,
+    tanggal_prestasi,
+    siswa,
+  } = req.body;
 
   if (
     nama_prestasi === '' ||
     jenis_prestasi === '' ||
-    tahun_prestasi === '' ||
+    tanggal_prestasi === '' ||
     siswa === ''
   ) {
     const message =
@@ -116,8 +121,8 @@ const updatePrestasi = async (req, res) => {
         ? 'Nama prestasi harus diisi'
         : jenis_prestasi === ''
         ? 'Jenis prestasi harus diisi'
-        : tahun_prestasi === ''
-        ? 'Tahun prestasi harus diisi'
+        : tanggal_prestasi === ''
+        ? 'Tanggal prestasi harus diisi'
         : siswa === ''
         ? 'Nama siswa harus diisi'
         : '';
@@ -125,8 +130,8 @@ const updatePrestasi = async (req, res) => {
   }
 
   const statement = await query(
-    'UPDATE prestasi_siswa SET nama_prestasi = ?, jenis_prestasi = ?, tahun_prestasi = ?, siswa = ? WHERE id_prestasi = ?',
-    [nama_prestasi, jenis_prestasi, tahun_prestasi, siswa, id_prestasi]
+    'UPDATE prestasi_siswa SET nama_prestasi = ?, jenis_prestasi = ?, tanggal_prestasi = ?, siswa = ? WHERE id_prestasi = ?',
+    [nama_prestasi, jenis_prestasi, tanggal_prestasi, siswa, id_prestasi]
   );
 
   try {
