@@ -23,7 +23,7 @@ const getPpdb = async (req, res) => {
   };
 
   const statement = await query(
-    'SELECT id_ppdb, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_ppdb, angkatan, tahun_ajaran FROM ppdb',
+    'SELECT id_ppdb, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_ppdb, angkatan, no_angkatan, tahun_ajaran, tahun_ajaran.tahun_mulai_ajaran, tahun_ajaran.tahun_akhir_ajaran FROM ppdb LEFT JOIN angkatan ON ppdb.angkatan = angkatan.id_angkatan LEFT JOIN tahun_ajaran ON ppdb.tahun_ajaran = tahun_ajaran.id_tahun_ajaran ORDER BY status_ppdb ASC',
     []
   );
 
@@ -218,6 +218,7 @@ const createPpdb = async (req, res) => {
       data: result.affectedRows < 1 ? null : req.body,
     });
   } catch (error) {
+    req.file && fs.unlinkSync(req.file.path);
     return res.status(500).json({ message: 'Internal error', status: 500 });
   }
 };
@@ -324,7 +325,7 @@ const updatePpdb = async (req, res) => {
     req.file && path.relative('public', filePath).replace(/\\/g, '/');
 
   const statement = await query(
-    'UPDATE ppdb SET no_pendaftaran = ?, nama = ?, jenis_kelamin = ?, nipd = ?, nik = ?, no_telepon_siswa = ?, alamat = ?, email = ?, tempat_lahir = ?, tanggal_lahir = ?, agama = ?, nama_ortu = ?, no_telepon_ortu = ?, foto = ?, status_ppdb = ?, angkatan = ?, tahun_ajaran = ?',
+    'UPDATE ppdb SET no_pendaftaran = ?, nama = ?, jenis_kelamin = ?, nipd = ?, nik = ?, no_telepon_siswa = ?, alamat = ?, email = ?, tempat_lahir = ?, tanggal_lahir = ?, agama = ?, nama_ortu = ?, no_telepon_ortu = ?, foto = ?, status_ppdb = ?, angkatan = ?, tahun_ajaran = ? WHERE id_ppdb = ?',
     [
       no_pendaftaran,
       nama,
@@ -339,7 +340,7 @@ const updatePpdb = async (req, res) => {
       agama,
       nama_ortu,
       no_telepon_ortu,
-      foto,
+      req.file == undefined ? getFoto.foto : foto,
       status_ppdb,
       angkatan,
       tahun_ajaran,
@@ -358,6 +359,7 @@ const updatePpdb = async (req, res) => {
       data: result.affectedRows < 1 ? null : req.body,
     });
   } catch (error) {
+    req.file && fs.unlinkSync(filePath);
     return res.status(500).json({ message: 'Internal error', status: 500 });
   }
 };

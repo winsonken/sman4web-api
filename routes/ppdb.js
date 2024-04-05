@@ -10,11 +10,12 @@ const {
   updatePindahSiswa,
 } = require('../controllers/ppdb');
 
+const { uploadImage } = require('../middleware/upload');
 const app = express();
 
 app.get('/ppdb', getPpdb);
-app.post('/ppdb', createPpdb);
-app.put('/ppdb', updatePpdb);
+app.post('/ppdb', uploadImage, createPpdb);
+app.put('/ppdb', uploadImage, updatePpdb);
 app.delete('/ppdb/:id', deletePpdb);
 app.post('/ppdb/terima-ppdb', updateTerimaPpdb);
 app.post('/ppdb/tolak-ppdb', updateTolakPpdb);
