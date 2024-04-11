@@ -22,9 +22,11 @@ const getTendik = async (req, res) => {
     status_kepegawaian: status_kepegawaian,
   };
 
+  const statusAktif = 1;
+
   const statement = await query(
-    'SELECT id_tendik, nama, jenis_kelamin, nik, no_tendik, jenis_ptk, no_telepon_tendik, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, foto, status_kawin, status_tendik, status_kepegawaian, username, password, nama_role AS role FROM tendik LEFT JOIN role ON tendik.role = role.id_role',
-    []
+    'SELECT id_tendik, nama, jenis_kelamin, nik, no_tendik, jenis_ptk, no_telepon_tendik, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, foto, status_kawin, status_tendik, status_kepegawaian, username, nama_role, role FROM tendik LEFT JOIN role ON tendik.role = role.id_role WHERE status_tendik = ?',
+    [statusAktif]
   );
 
   const filterParameter = statement.filter((object) =>
@@ -350,7 +352,7 @@ const updateTendik = async (req, res) => {
       tempat_lahir,
       tanggal_lahir,
       agama,
-      foto,
+      req.file == undefined ? getFoto.foto : foto,
       status_kawin,
       status_tendik,
       status_kepegawaian,
@@ -381,6 +383,12 @@ const updateTendik = async (req, res) => {
 
 const deleteTendik = async (req, res) => {
   const { id } = req.params;
+
+  if (id == 'a8c8fe0b97996298eb084322c9d525f3') {
+    return res
+      .status(400)
+      .json({ message: 'Akun admin ini tidak dapat dihapus', status: 400 });
+  }
 
   const statement = await query(`DELETE FROM tendik WHERE id_tendik = ?`, [id]);
 

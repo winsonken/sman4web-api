@@ -82,7 +82,7 @@ const getSiswaBaru = async (req, res) => {
   };
 
   const statement = await query(
-    'SELECT id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, jurusan, username, nama_role AS role FROM siswa LEFT JOIN role ON siswa.role = role.id_role WHERE status_siswa = 0',
+    'SELECT id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, no_angkatan,  jurusan, username, nama_role AS role FROM siswa LEFT JOIN role ON siswa.role = role.id_role LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan WHERE status_siswa = 0',
     []
   );
 
@@ -135,7 +135,7 @@ const createSiswa = async (req, res) => {
     nama_ortu,
     no_telepon_ortu,
     angkatan,
-    jurusan,
+    // jurusan,
   } = req.body;
 
   if (
@@ -250,7 +250,7 @@ const createSiswa = async (req, res) => {
   }
 
   const statement = await query(
-    'INSERT INTO siswa (id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, jurusan, username, password, role) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    'INSERT INTO siswa (id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, username, password, role) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
     [
       id_siswa,
       no_pendaftaran,
@@ -269,12 +269,27 @@ const createSiswa = async (req, res) => {
       foto,
       status_siswa,
       angkatan,
-      jurusan,
+      // jurusan,
       username,
       hash,
       role,
     ]
   );
+
+  const statusAktif = 1;
+  const [getJumlahSiswa] =
+    statement.affectedRows > 0 &&
+    (await query(
+      'SELECT COUNT(id_siswa) AS jumlah_siswa FROM siswa WHERE status_siswa = ? AND angkatan = ?',
+      [statusAktif, angkatan]
+    ));
+
+  const updateJumlahSiswa =
+    statement.affectedRows > 0 &&
+    (await query('UPDATE angkatan SET jumlah_siswa = ? WHERE id_angkatan = ?', [
+      getJumlahSiswa?.jumlah_siswa,
+      angkatan,
+    ]));
 
   try {
     const result = statement;
@@ -456,13 +471,28 @@ const updateSiswa = async (req, res) => {
       req.file == undefined ? getFoto.foto : foto,
       status_siswa,
       angkatan,
-      jurusan,
+      jurusan ? jurusan : null,
       username,
       password ? hash : getOldPassword.password,
       role,
       id_siswa,
     ]
   );
+
+  const statusAktif = 1;
+  const [getJumlahSiswa] =
+    statement.affectedRows > 0 &&
+    (await query(
+      'SELECT COUNT(id_siswa) AS jumlah_siswa FROM siswa WHERE status_siswa = ? AND angkatan = ?',
+      [statusAktif, angkatan]
+    ));
+
+  const updateJumlahSiswa =
+    statement.affectedRows > 0 &&
+    (await query('UPDATE angkatan SET jumlah_siswa = ? WHERE id_angkatan = ?', [
+      getJumlahSiswa?.jumlah_siswa,
+      angkatan,
+    ]));
 
   try {
     const result = statement;
@@ -497,7 +527,28 @@ const deleteSiswa = async (req, res) => {
     //     .json({ message: 'Error removing image', status: 500 });
     // }
 
+    const [getAngkatan] = await query(
+      'SELECT angkatan FROM siswa WHERE id_siswa = ?',
+      [id]
+    );
+
     const statement = await query(`DELETE FROM siswa WHERE id_siswa = ?`, [id]);
+
+    const statusAktif = 1;
+    const [getJumlahSiswa] =
+      statement.affectedRows > 0 &&
+      (await query(
+        'SELECT COUNT(id_siswa) AS jumlah_siswa FROM siswa WHERE status_siswa = ? AND angkatan = ?',
+        [statusAktif, getAngkatan.angkatan]
+      ));
+
+    const updateJumlahSiswa =
+      statement.affectedRows > 0 &&
+      (await query(
+        'UPDATE angkatan SET jumlah_siswa = ? WHERE id_angkatan = ?',
+        [getJumlahSiswa.jumlah_siswa, getAngkatan.angkatan]
+      ));
+
     const result = statement;
     const message =
       result.affectedRows < 1
@@ -516,10 +567,26 @@ const deleteSiswa = async (req, res) => {
 const updateSetAktif = async (req, res) => {
   const statusAktif = 1;
   const statusBaru = 0;
+  const statusAngkatan = 1;
+
+  const [getAngkatan] = await query(
+    'SELECT angkatan FROM siswa LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan WHERE status_siswa = ? AND status_angkatan = ?',
+    [statusBaru, statusAngkatan]
+  );
 
   const statement = await query(
-    `UPDATE siswa SET status_siswa = ? WHERE status_siswa = ?`,
-    [statusAktif, statusBaru]
+    `UPDATE siswa LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan SET status_siswa = ? WHERE status_siswa = ? AND status_angkatan = ?`,
+    [statusAktif, statusBaru, statusAngkatan]
+  );
+
+  const [getJumlahSiswa] = await query(
+    'SELECT COUNT(id_siswa) AS jumlah_siswa FROM siswa WHERE status_siswa = ? AND angkatan = ?',
+    [statusAktif, getAngkatan?.angkatan]
+  );
+
+  const updateJumlahSiswa = await query(
+    'UPDATE angkatan SET jumlah_siswa = ? WHERE id_angkatan = ?',
+    [getJumlahSiswa.jumlah_siswa, getAngkatan?.angkatan]
   );
 
   try {

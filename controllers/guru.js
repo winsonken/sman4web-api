@@ -24,9 +24,11 @@ const getGuru = async (req, res) => {
     status_kepegawaian: status_kepegawaian,
   };
 
+  const statusAktif = 1;
+
   const statement = await query(
-    'SELECT id_guru, nama, jenis_kelamin, nik, no_guru, jenis_ptk, no_telepon_guru, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, foto, status_kawin, status_guru, status_kepegawaian, username, password, nama_role AS role FROM guru LEFT JOIN role ON guru.role = role.id_role',
-    []
+    'SELECT id_guru, nama, jenis_kelamin, nik, no_guru, jenis_ptk, no_telepon_guru, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, foto, status_kawin, status_guru, status_kepegawaian, username, nama_role, role FROM guru LEFT JOIN role ON guru.role = role.id_role WHERE status_guru = ?',
+    [statusAktif]
   );
 
   const filterParameter = statement.filter((object) =>
@@ -348,7 +350,7 @@ const updateGuru = async (req, res) => {
       tempat_lahir,
       tanggal_lahir,
       agama,
-      foto,
+      req.file == undefined ? getFoto.foto : foto,
       status_kawin,
       status_guru,
       status_kepegawaian,
