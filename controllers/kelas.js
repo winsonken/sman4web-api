@@ -7,6 +7,9 @@ const idGenerator = () => {
 
 const getKelas = async (req, res) => {
   const angkatan = req.query.angkatan || '';
+  const tahunAjaran = req.query.tahunAjaran || '';
+  const jurusan = req.query.jurusan || '';
+  const kelas = req.query.kelas || '';
   const search = req.query.q || '';
   const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
   const limit =
@@ -14,23 +17,27 @@ const getKelas = async (req, res) => {
 
   const payload = {
     no_angkatan: angkatan,
+    tahun_ajaran: tahunAjaran,
+    jurusan: jurusan,
+    kelas: kelas,
   };
 
   const statement = await query(
-    'SELECT id_kelas, kelas, nama_kelas, guru.nama AS walikelas, jurusan.nama_jurusan, angkatan.no_angkatan, tahun_ajaran.tahun_mulai_ajaran, tahun_ajaran.tahun_akhir_ajaran FROM kelas LEFT JOIN guru ON kelas.walikelas = guru.id_guru LEFT JOIN jurusan ON kelas.jurusan = jurusan.id_jurusan LEFT JOIN angkatan ON kelas.angkatan = angkatan.id_angkatan LEFT JOIN tahun_ajaran ON kelas.tahun_ajaran = tahun_ajaran.id_tahun_ajaran',
+    'SELECT id_kelas, kelas, nama_kelas, guru.id_guru, guru.nama AS walikelas, jurusan, jurusan.nama_jurusan, angkatan, angkatan.no_angkatan, tahun_ajaran, tahun_ajaran.tahun_mulai_ajaran, tahun_ajaran.tahun_akhir_ajaran FROM kelas LEFT JOIN guru ON kelas.walikelas = guru.id_guru LEFT JOIN jurusan ON kelas.jurusan = jurusan.id_jurusan LEFT JOIN angkatan ON kelas.angkatan = angkatan.id_angkatan LEFT JOIN tahun_ajaran ON kelas.tahun_ajaran = tahun_ajaran.id_tahun_ajaran ORDER BY kelas ASC, nama_kelas ASC',
     []
   );
 
   const filterParameter = statement.filter((object) =>
     Object.keys(payload).every((key) =>
-      payload[key] == ''
-        ? object
-        : object[key].toString() == payload[key].toString()
+      payload[key] == '' ? object : object[key] == payload[key]
     )
   );
 
   const filterSearch = filterParameter.filter((object) =>
-    search == '' ? object : object.kelas.toString().startsWith(search)
+    search == ''
+      ? object
+      : object.kelas.toString().startsWith(search) ||
+        object.nama_kelas.toLowerCase().startsWith(search.toLowerCase())
   );
 
   try {
@@ -88,6 +95,18 @@ const createKelas = async (req, res) => {
   if (checkKelasDuplicate.length > 0) {
     return res.status(400).json({
       message: `Kelas ${nama_kelas} sudah ada untuk tahun ajaran ini`,
+      status: 400,
+    });
+  }
+
+  const checkKelasExist = await query(
+    'SELECT id_kelas FROM kelas WHERE kelas = ? AND nama_kelas = ? AND angkatan = ?',
+    [kelas, nama_kelas, angkatan]
+  );
+
+  if (checkKelasExist.length > 0) {
+    return res.status(400).json({
+      message: `Kelas ${nama_kelas} sudah ada untuk angkatan ini`,
       status: 400,
     });
   }

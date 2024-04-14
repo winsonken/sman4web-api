@@ -6,6 +6,7 @@ const idGenerator = () => {
 };
 
 const getKelasSiswa = async (req, res) => {
+  const kelas = req.query.kelas || '';
   const siswa = req.query.siswa || '';
   const search = req.query.q || '';
   const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
@@ -14,10 +15,11 @@ const getKelasSiswa = async (req, res) => {
 
   const payload = {
     nama_siswa: siswa,
+    kelas: kelas,
   };
 
   const statement = await query(
-    'SELECT id_kelas_siswa, status_kelas_siswa, kelas.nama_kelas, siswa.nama AS nama_siswa, rapot FROM kelas_siswa LEFT JOIN kelas ON kelas_siswa.kelas = kelas.id_kelas LEFT JOIN siswa ON kelas_siswa.siswa = siswa.id_siswa',
+    'SELECT id_kelas_siswa, status_kelas_siswa, kelas_siswa.kelas, kelas.kelas AS no_kelas, kelas.nama_kelas, kelas_siswa.siswa, siswa.jurusan, siswa.nama AS nama_siswa, rapot, rapot_siswa.rapot_ganjil_awal, rapot_siswa.rapot_ganjil_akhir, rapot_siswa.rapot_genap_awal, rapot_siswa.rapot_genap_akhir FROM kelas_siswa LEFT JOIN kelas ON kelas_siswa.kelas = kelas.id_kelas LEFT JOIN siswa ON kelas_siswa.siswa = siswa.id_siswa LEFT JOIN rapot_siswa ON kelas_siswa.rapot = rapot_siswa.id_rapot',
     []
   );
 
@@ -200,9 +202,123 @@ const deleteKelasSiswa = async (req, res) => {
   }
 };
 
+const updateNaikKelas = async (req, res) => {
+  const { id_kelas_siswa } = req.body;
+  const statusNaikKelas = 2;
+
+  const statement = await query(
+    `UPDATE kelas_siswa SET status_kelas_siswa = ? WHERE id_kelas_siswa = ?`,
+    [statusNaikKelas, id_kelas_siswa]
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Siswa gagal naik kelas'
+        : 'Siswa berhasil naik kelas';
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+const updateTinggalKelas = async (req, res) => {
+  const { id_kelas_siswa } = req.body;
+  const statusTinggalKelas = 3;
+
+  const statement = await query(
+    `UPDATE kelas_siswa SET status_kelas_siswa = ? WHERE id_kelas_siswa = ?`,
+    [statusTinggalKelas, id_kelas_siswa]
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Siswa gagal tinggal kelas'
+        : 'Siswa berhasil tinggal kelas';
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+const updateLulus = async (req, res) => {
+  const { id_kelas_siswa } = req.body;
+  const statusLulus = 4;
+
+  const [getSiswa] = await query(
+    'SELECT siswa FROM kelas_siswa WHERE id_kelas_siswa = ?',
+    [id_kelas_siswa]
+  );
+
+  const statement = await query(
+    `UPDATE kelas_siswa SET status_kelas_siswa = ? WHERE id_kelas_siswa = ?`,
+    [statusLulus, id_kelas_siswa]
+  );
+
+  statement.affectedRows > 0 &&
+    (await query('UPDATE siswa SET status_siswa = 2 WHERE id_siswa = ?', [
+      getSiswa?.siswa,
+    ]));
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Siswa gagal diluluskan'
+        : 'Siswa berhasil diluluskan';
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+const updateTidakLulus = async (req, res) => {
+  const { id_kelas_siswa } = req.body;
+  const statusTidakLulus = 5;
+
+  const statement = await query(
+    `UPDATE kelas_siswa SET status_kelas_siswa = ? WHERE id_kelas_siswa = ?`,
+    [statusTidakLulus, id_kelas_siswa]
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Siswa gagal tidak diluluskan'
+        : 'Siswa berhasil tidak diluluskan';
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
 module.exports = {
   getKelasSiswa,
   createKelasSiswa,
   updateKelasSiswa,
   deleteKelasSiswa,
+  updateNaikKelas,
+  updateTinggalKelas,
+  updateLulus,
+  updateTidakLulus,
 };

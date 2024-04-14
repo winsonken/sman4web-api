@@ -128,6 +128,59 @@ const getTahunAjaran = async (req, res) => {
   }
 };
 
+const getTahunAjaranAktif = async (req, res) => {
+  const status = req.query.status || '';
+  const search = req.query.q || '';
+  const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
+  const limit =
+    Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
+
+  const payload = {
+    status_tahun_ajaran: status,
+  };
+
+  const statement = await query(
+    'SELECT id_tahun_ajaran, tahun_mulai_ajaran, tahun_akhir_ajaran, DATE_FORMAT(mulai_periode_ganjil, "%Y-%m-%d") AS mulai_periode_ganjil, DATE_FORMAT(akhir_periode_ganjil, "%Y-%m-%d") AS akhir_periode_ganjil, DATE_FORMAT(mulai_periode_genap, "%Y-%m-%d") AS mulai_periode_genap, DATE_FORMAT(akhir_periode_genap, "%Y-%m-%d") AS akhir_periode_genap, status_tahun_ajaran FROM tahun_ajaran WHERE status_tahun_ajaran = 1 ORDER BY status_tahun_ajaran ASC',
+    []
+  );
+
+  const filterParameter = statement.filter((object) =>
+    Object.keys(payload).every((key) =>
+      payload[key] == '' ? object : object[key] == payload[key]
+    )
+  );
+
+  const filterSearch = filterParameter.filter((object) =>
+    search == ''
+      ? object
+      : object.tahun_mulai_ajaran.toString().startsWith(search) ||
+        object.tahun_akhir_ajaran.toString().startsWith(search) ||
+        `${object.tahun_mulai_ajaran}-${object.tahun_akhir_ajaran}`.startsWith(
+          search
+        )
+  );
+
+  try {
+    const result = Object.keys(payload).length < 1 ? statement : filterSearch;
+    const message =
+      result.length >= 0
+        ? 'Tahun ajaran berhasil ditemukan'
+        : 'Tahun ajaran tidak ditemukan';
+    const status = result.length >= 0 ? 200 : 400;
+
+    const paginationResult = pagination(result, page, limit);
+
+    return res.status(status).json({
+      message: message,
+      status: status,
+      data: paginationResult?.data,
+      pagination: paginationResult?.pagination,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
 const getTahunAjaranBerakhir = async (req, res) => {
   const status = req.query.status || '';
   const search = req.query.q || '';
@@ -141,6 +194,59 @@ const getTahunAjaranBerakhir = async (req, res) => {
 
   const statement = await query(
     'SELECT id_tahun_ajaran, tahun_mulai_ajaran, tahun_akhir_ajaran, DATE_FORMAT(mulai_periode_ganjil, "%Y-%m-%d") AS mulai_periode_ganjil, DATE_FORMAT(akhir_periode_ganjil, "%Y-%m-%d") AS akhir_periode_ganjil, DATE_FORMAT(mulai_periode_genap, "%Y-%m-%d") AS mulai_periode_genap, DATE_FORMAT(akhir_periode_genap, "%Y-%m-%d") AS akhir_periode_genap, status_tahun_ajaran FROM tahun_ajaran WHERE status_tahun_ajaran = 2 ORDER BY status_tahun_ajaran ASC',
+    []
+  );
+
+  const filterParameter = statement.filter((object) =>
+    Object.keys(payload).every((key) =>
+      payload[key] == '' ? object : object[key] == payload[key]
+    )
+  );
+
+  const filterSearch = filterParameter.filter((object) =>
+    search == ''
+      ? object
+      : object.tahun_mulai_ajaran.toString().startsWith(search) ||
+        object.tahun_akhir_ajaran.toString().startsWith(search) ||
+        `${object.tahun_mulai_ajaran}-${object.tahun_akhir_ajaran}`.startsWith(
+          search
+        )
+  );
+
+  try {
+    const result = Object.keys(payload).length < 1 ? statement : filterSearch;
+    const message =
+      result.length >= 0
+        ? 'Tahun ajaran berhasil ditemukan'
+        : 'Tahun ajaran tidak ditemukan';
+    const status = result.length >= 0 ? 200 : 400;
+
+    const paginationResult = pagination(result, page, limit);
+
+    return res.status(status).json({
+      message: message,
+      status: status,
+      data: paginationResult?.data,
+      pagination: paginationResult?.pagination,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+const getAllTahunAjaran = async (req, res) => {
+  const status = req.query.status || '';
+  const search = req.query.q || '';
+  const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
+  const limit =
+    Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
+
+  const payload = {
+    status_tahun_ajaran: status,
+  };
+
+  const statement = await query(
+    'SELECT id_tahun_ajaran, tahun_mulai_ajaran, tahun_akhir_ajaran, DATE_FORMAT(mulai_periode_ganjil, "%Y-%m-%d") AS mulai_periode_ganjil, DATE_FORMAT(akhir_periode_ganjil, "%Y-%m-%d") AS akhir_periode_ganjil, DATE_FORMAT(mulai_periode_genap, "%Y-%m-%d") AS mulai_periode_genap, DATE_FORMAT(akhir_periode_genap, "%Y-%m-%d") AS akhir_periode_genap, status_tahun_ajaran FROM tahun_ajaran ORDER BY status_tahun_ajaran ASC',
     []
   );
 
@@ -491,7 +597,9 @@ const updateSelesaiTahunAjaran = async (req, res) => {
 
 module.exports = {
   getTahunAjaran,
+  getTahunAjaranAktif,
   getTahunAjaranBerakhir,
+  getAllTahunAjaran,
   createTahunAjaran,
   updateTahunAjaran,
   deleteTahunAjaran,

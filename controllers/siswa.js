@@ -119,6 +119,171 @@ const getSiswaBaru = async (req, res) => {
   }
 };
 
+const getSiswaLulus = async (req, res) => {
+  const status = req.query.status || '';
+  const angkatan = req.query.angkatan || '';
+  const nipd = req.query.nipd || '';
+  const nama = req.query.nama || '';
+  const search = req.query.q || '';
+  const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
+  const limit =
+    Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
+
+  const payload = {
+    status_siswa: status,
+    nama: nama,
+    angkatan: angkatan,
+    nipd: nipd,
+  };
+
+  const statement = await query(
+    'SELECT id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, no_angkatan,  jurusan, username, nama_role AS role FROM siswa LEFT JOIN role ON siswa.role = role.id_role LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan WHERE status_siswa = 2',
+    []
+  );
+
+  const filterParameter = statement.filter((object) =>
+    Object.keys(payload).every((key) =>
+      payload[key] == '' ? object : object[key] == payload[key]
+    )
+  );
+
+  const filterSearch = filterParameter.filter((object) =>
+    search == ''
+      ? object
+      : object.nama.toLowerCase().startsWith(search) ||
+        object.angkatan.toLowerCase().startsWith(search) ||
+        object.nipd.toString().startsWith(search)
+  );
+
+  try {
+    const result = Object.keys(payload).length < 1 ? statement : filterSearch;
+    const message =
+      result.length >= 0 ? 'Siswa berhasil ditemukan' : 'Siswa tidak ditemukan';
+    const status = result.length >= 0 ? 200 : 400;
+
+    const paginationResult = pagination(result, page, limit);
+
+    return res.status(status).json({
+      message: message,
+      status: status,
+      data: paginationResult?.data,
+      pagination: paginationResult?.pagination,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+const getSiswaAlumni = async (req, res) => {
+  const status = req.query.status || '';
+  const angkatan = req.query.angkatan || '';
+  const nipd = req.query.nipd || '';
+  const nama = req.query.nama || '';
+  const search = req.query.q || '';
+  const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
+  const limit =
+    Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
+
+  const payload = {
+    status_siswa: status,
+    nama: nama,
+    angkatan: angkatan,
+    nipd: nipd,
+  };
+
+  const statement = await query(
+    'SELECT id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, no_angkatan,  jurusan, username, nama_role AS role FROM siswa LEFT JOIN role ON siswa.role = role.id_role LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan WHERE status_siswa = 3',
+    []
+  );
+
+  const filterParameter = statement.filter((object) =>
+    Object.keys(payload).every((key) =>
+      payload[key] == '' ? object : object[key] == payload[key]
+    )
+  );
+
+  const filterSearch = filterParameter.filter((object) =>
+    search == ''
+      ? object
+      : object.nama.toLowerCase().startsWith(search) ||
+        object.angkatan.toLowerCase().startsWith(search) ||
+        object.nipd.toString().startsWith(search)
+  );
+
+  try {
+    const result = Object.keys(payload).length < 1 ? statement : filterSearch;
+    const message =
+      result.length >= 0 ? 'Siswa berhasil ditemukan' : 'Siswa tidak ditemukan';
+    const status = result.length >= 0 ? 200 : 400;
+
+    const paginationResult = pagination(result, page, limit);
+
+    return res.status(status).json({
+      message: message,
+      status: status,
+      data: paginationResult?.data,
+      pagination: paginationResult?.pagination,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+const getSiswaBelumAdaKelas = async (req, res) => {
+  const status = req.query.status || '';
+  const angkatan = req.query.angkatan || '';
+  const nipd = req.query.nipd || '';
+  const nama = req.query.nama || '';
+  const search = req.query.q || '';
+  const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
+  const limit =
+    Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
+
+  const payload = {
+    status_siswa: status,
+    nama: nama,
+    angkatan: angkatan,
+    nipd: nipd,
+  };
+
+  const statement = await query(
+    'SELECT id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, no_angkatan,  jurusan, username, nama_role AS role FROM siswa LEFT JOIN role ON siswa.role = role.id_role LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan LEFT JOIN kelas_siswa ON siswa.id_siswa = kelas_siswa.siswa WHERE kelas_siswa.siswa IS NULL AND status_siswa = 1',
+    []
+  );
+
+  const filterParameter = statement.filter((object) =>
+    Object.keys(payload).every((key) =>
+      payload[key] == '' ? object : object[key] == payload[key]
+    )
+  );
+
+  const filterSearch = filterParameter.filter((object) =>
+    search == ''
+      ? object
+      : object.nama.toLowerCase().startsWith(search) ||
+        object.angkatan.toLowerCase().startsWith(search) ||
+        object.nipd.toString().startsWith(search)
+  );
+
+  try {
+    const result = Object.keys(payload).length < 1 ? statement : filterSearch;
+    const message =
+      result.length >= 0 ? 'Siswa berhasil ditemukan' : 'Siswa tidak ditemukan';
+    const status = result.length >= 0 ? 200 : 400;
+
+    const paginationResult = pagination(result, page, limit);
+
+    return res.status(status).json({
+      message: message,
+      status: status,
+      data: paginationResult?.data,
+      pagination: paginationResult?.pagination,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
 const createSiswa = async (req, res) => {
   const {
     no_pendaftaran,
@@ -638,6 +803,9 @@ const updateSetJurusan = async (req, res) => {
 module.exports = {
   getSiswa,
   getSiswaBaru,
+  getSiswaLulus,
+  getSiswaAlumni,
+  getSiswaBelumAdaKelas,
   createSiswa,
   updateSiswa,
   deleteSiswa,
