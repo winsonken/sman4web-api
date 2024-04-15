@@ -12,14 +12,23 @@ const getPelanggaran = async (req, res) => {
   const limit =
     Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
 
+  const isSiswa = req.userRole == '45cc3b0962e46586971c66b152a8a293';
+
   const payload = {
     id_siswa: siswa,
   };
-
-  const statement = await query(
-    'SELECT id_pelanggaran, jenis_pelanggaran, DATE_FORMAT(tanggal_pelanggaran, "%Y-%m-%d") AS tanggal_pelanggaran, siswa.nama AS nama_siswa, siswa.nipd, siswa.id_siswa FROM pelanggaran LEFT JOIN siswa ON pelanggaran.siswa = siswa.id_siswa',
-    []
-  );
+  let statement;
+  if (isSiswa) {
+    statement = await query(
+      'SELECT id_pelanggaran, jenis_pelanggaran, DATE_FORMAT(tanggal_pelanggaran, "%Y-%m-%d") AS tanggal_pelanggaran, siswa.nama AS nama_siswa, siswa.nipd, siswa.id_siswa FROM pelanggaran LEFT JOIN siswa ON pelanggaran.siswa = siswa.id_siswa WHERE siswa.id_siswa = ?',
+      [req.userId]
+    );
+  } else {
+    statement = await query(
+      'SELECT id_pelanggaran, jenis_pelanggaran, DATE_FORMAT(tanggal_pelanggaran, "%Y-%m-%d") AS tanggal_pelanggaran, siswa.nama AS nama_siswa, siswa.nipd, siswa.id_siswa FROM pelanggaran LEFT JOIN siswa ON pelanggaran.siswa = siswa.id_siswa',
+      []
+    );
+  }
 
   const filterParameter = statement.filter((object) =>
     Object.keys(payload).every((key) =>
