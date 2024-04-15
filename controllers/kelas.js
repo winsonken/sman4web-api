@@ -37,7 +37,8 @@ const getKelas = async (req, res) => {
     search == ''
       ? object
       : object.kelas.toString().startsWith(search) ||
-        object.nama_kelas.toLowerCase().startsWith(search.toLowerCase())
+        object.nama_kelas.toLowerCase().startsWith(search.toLowerCase()) ||
+        object.nama_jurusan?.toLowerCase().startsWith(search.toLowerCase())
   );
 
   try {

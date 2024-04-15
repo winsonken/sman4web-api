@@ -246,7 +246,7 @@ const getAllTahunAjaran = async (req, res) => {
   };
 
   const statement = await query(
-    'SELECT id_tahun_ajaran, tahun_mulai_ajaran, tahun_akhir_ajaran, DATE_FORMAT(mulai_periode_ganjil, "%Y-%m-%d") AS mulai_periode_ganjil, DATE_FORMAT(akhir_periode_ganjil, "%Y-%m-%d") AS akhir_periode_ganjil, DATE_FORMAT(mulai_periode_genap, "%Y-%m-%d") AS mulai_periode_genap, DATE_FORMAT(akhir_periode_genap, "%Y-%m-%d") AS akhir_periode_genap, status_tahun_ajaran FROM tahun_ajaran ORDER BY status_tahun_ajaran ASC',
+    'SELECT id_tahun_ajaran, tahun_mulai_ajaran, tahun_akhir_ajaran, DATE_FORMAT(mulai_periode_ganjil, "%Y-%m-%d") AS mulai_periode_ganjil, DATE_FORMAT(akhir_periode_ganjil, "%Y-%m-%d") AS akhir_periode_ganjil, DATE_FORMAT(mulai_periode_genap, "%Y-%m-%d") AS mulai_periode_genap, DATE_FORMAT(akhir_periode_genap, "%Y-%m-%d") AS akhir_periode_genap, status_tahun_ajaran FROM tahun_ajaran ORDER BY tahun_mulai_ajaran DESC',
     []
   );
 

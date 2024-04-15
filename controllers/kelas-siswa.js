@@ -19,7 +19,7 @@ const getKelasSiswa = async (req, res) => {
   };
 
   const statement = await query(
-    'SELECT id_kelas_siswa, status_kelas_siswa, kelas_siswa.kelas, kelas.kelas AS no_kelas, kelas.nama_kelas, kelas_siswa.siswa, siswa.jurusan, siswa.nama AS nama_siswa, rapot, rapot_siswa.rapot_ganjil_awal, rapot_siswa.rapot_ganjil_akhir, rapot_siswa.rapot_genap_awal, rapot_siswa.rapot_genap_akhir FROM kelas_siswa LEFT JOIN kelas ON kelas_siswa.kelas = kelas.id_kelas LEFT JOIN siswa ON kelas_siswa.siswa = siswa.id_siswa LEFT JOIN rapot_siswa ON kelas_siswa.rapot = rapot_siswa.id_rapot',
+    'SELECT id_kelas_siswa, no_absen, status_kelas_siswa, kelas_siswa.kelas, kelas.kelas AS no_kelas, kelas.nama_kelas, kelas_siswa.siswa, siswa.jurusan, jurusan.nama_jurusan, siswa.nama AS nama_siswa, kelas.walikelas, guru.nama AS nama_walikelas, rapot, rapot_siswa.rapot_ganjil_awal, rapot_siswa.rapot_ganjil_akhir, rapot_siswa.rapot_genap_awal, rapot_siswa.rapot_genap_akhir, kelas.tahun_ajaran, tahun_ajaran.tahun_mulai_ajaran, tahun_ajaran.tahun_akhir_ajaran FROM kelas_siswa LEFT JOIN kelas ON kelas_siswa.kelas = kelas.id_kelas LEFT JOIN siswa ON kelas_siswa.siswa = siswa.id_siswa LEFT JOIN rapot_siswa ON kelas_siswa.rapot = rapot_siswa.id_rapot LEFT JOIN guru ON kelas.walikelas = guru.id_guru LEFT JOIN tahun_ajaran ON kelas.tahun_ajaran = tahun_ajaran.id_tahun_ajaran LEFT JOIN jurusan ON kelas.jurusan = jurusan.id_jurusan ORDER BY no_kelas ASC, no_absen ASC ',
     []
   );
 
@@ -134,7 +134,7 @@ const createKelasSiswa = async (req, res) => {
 };
 
 const updateKelasSiswa = async (req, res) => {
-  const { id_kelas_siswa, status_kelas_siswa } = req.body;
+  const { id_kelas_siswa, no_absen, status_kelas_siswa } = req.body;
   const status_tahun_ajaran = 1;
 
   if (status_kelas_siswa === '') {
@@ -143,9 +143,25 @@ const updateKelasSiswa = async (req, res) => {
     return res.status(400).json({ message: message, status: 400 });
   }
 
+  const [getKelas] = await query(
+    'SELECT kelas FROM kelas_siswa WHERE id_kelas_siswa = ?',
+    [id_kelas_siswa]
+  );
+
+  const checkNoAbsen = await query(
+    'SELECT id_kelas_siswa FROM kelas_siswa LEFT JOIN kelas ON kelas_siswa.kelas = kelas.id_kelas WHERE kelas_siswa.kelas = ? AND no_absen = ? AND id_kelas_siswa != ?',
+    [getKelas?.kelas, no_absen, id_kelas_siswa]
+  );
+
+  if (checkNoAbsen.length > 0) {
+    return res
+      .status(400)
+      .json({ message: 'No absen sudah terdaftar', status: 400 });
+  }
+
   const statement = await query(
-    'UPDATE kelas_siswa SET status_kelas_siswa = ? WHERE id_kelas_siswa = ?',
-    [status_kelas_siswa, id_kelas_siswa]
+    'UPDATE kelas_siswa SET no_absen = ?, status_kelas_siswa = ? WHERE id_kelas_siswa = ?',
+    [no_absen, status_kelas_siswa, id_kelas_siswa]
   );
 
   try {

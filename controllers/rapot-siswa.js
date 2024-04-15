@@ -171,22 +171,36 @@ const updateRapotSiswa = async (req, res) => {
 // };
 
 const uploadRapotGanjilAwal = async (req, res) => {
-  const { id_rapot } = req.body;
+  const { id_rapot, file } = req.body;
 
   if (req.fileValidationError) {
     return res
       .status(400)
       .json({ message: req.fileValidationError.message, status: 400 });
-  } else if (!req.file) {
-    return res.status(400).json({ message: 'File harus diisi', status: 400 });
   }
+
+  // else if (!req.file) {
+  //   return res.status(400).json({ message: 'File harus diisi', status: 400 });
+  // }
 
   const [getRapot] = await query(
     'SELECT rapot_ganjil_awal FROM rapot_siswa WHERE id_rapot = ?',
     [id_rapot]
   );
 
-  if (getRapot.rapot_ganjil_awal !== null) {
+  if (req.file && getRapot.rapot_ganjil_awal !== null) {
+    try {
+      const img = path.relative('files', getRapot.rapot_ganjil_awal);
+      const filePath = path.resolve(__dirname, '..', 'public', 'files', img);
+      fs.unlinkSync(filePath);
+    } catch (error) {
+      return res.status(500).json({ message: 'Error', status: 500 });
+    }
+  } else if (
+    !file &&
+    req.file == undefined &&
+    getRapot.rapot_ganjil_awal !== null
+  ) {
     try {
       const img = path.relative('files', getRapot.rapot_ganjil_awal);
       const filePath = path.resolve(__dirname, '..', 'public', 'files', img);
@@ -196,14 +210,13 @@ const uploadRapotGanjilAwal = async (req, res) => {
     }
   }
 
-  const filePath = req.file.path;
-  const rapot_ganjil_awal = path
-    .relative('public', filePath)
-    .replace(/\\/g, '/');
+  const filePath = req.file && req.file.path;
+  const rapot_ganjil_awal =
+    req.file && path.relative('public', filePath).replace(/\\/g, '/');
 
   const statement = await query(
     'UPDATE rapot_siswa SET rapot_ganjil_awal = ? WHERE id_rapot = ?',
-    [rapot_ganjil_awal, id_rapot]
+    [file ? file : req.file == undefined ? null : rapot_ganjil_awal, id_rapot]
   );
 
   try {
@@ -222,22 +235,36 @@ const uploadRapotGanjilAwal = async (req, res) => {
 };
 
 const uploadRapotGanjilAkhir = async (req, res) => {
-  const { id_rapot } = req.body;
+  const { id_rapot, file } = req.body;
 
   if (req.fileValidationError) {
     return res
       .status(400)
       .json({ message: req.fileValidationError.message, status: 400 });
-  } else if (!req.file) {
-    return res.status(400).json({ message: 'File harus diisi', status: 400 });
   }
+
+  // else if (!req.file) {
+  //   return res.status(400).json({ message: 'File harus diisi', status: 400 });
+  // }
 
   const [getRapot] = await query(
     'SELECT rapot_ganjil_akhir FROM rapot_siswa WHERE id_rapot = ?',
     [id_rapot]
   );
 
-  if (getRapot.rapot_ganjil_akhir !== null) {
+  if (req.file && getRapot.rapot_ganjil_akhir !== null) {
+    try {
+      const img = path.relative('files', getRapot.rapot_ganjil_akhir);
+      const filePath = path.resolve(__dirname, '..', 'public', 'files', img);
+      fs.unlinkSync(filePath);
+    } catch (error) {
+      return res.status(500).json({ message: 'Error', status: 500 });
+    }
+  } else if (
+    !file &&
+    req.file == undefined &&
+    getRapot.rapot_ganjil_akhir !== null
+  ) {
     try {
       const img = path.relative('files', getRapot.rapot_ganjil_akhir);
       const filePath = path.resolve(__dirname, '..', 'public', 'files', img);
@@ -247,14 +274,13 @@ const uploadRapotGanjilAkhir = async (req, res) => {
     }
   }
 
-  const filePath = req.file.path;
-  const rapot_ganjil_akhir = path
-    .relative('public', filePath)
-    .replace(/\\/g, '/');
+  const filePath = req.file && req.file.path;
+  const rapot_ganjil_akhir =
+    req.file && path.relative('public', filePath).replace(/\\/g, '/');
 
   const statement = await query(
     'UPDATE rapot_siswa SET rapot_ganjil_akhir = ? WHERE id_rapot = ?',
-    [rapot_ganjil_akhir, id_rapot]
+    [file ? file : req.file == undefined ? null : rapot_ganjil_akhir, id_rapot]
   );
 
   try {
@@ -273,22 +299,36 @@ const uploadRapotGanjilAkhir = async (req, res) => {
 };
 
 const uploadRapotGenapAwal = async (req, res) => {
-  const { id_rapot } = req.body;
+  const { id_rapot, file } = req.body;
 
   if (req.fileValidationError) {
     return res
       .status(400)
       .json({ message: req.fileValidationError.message, status: 400 });
-  } else if (!req.file) {
-    return res.status(400).json({ message: 'File harus diisi', status: 400 });
   }
+
+  // else if (!req.file) {
+  //   return res.status(400).json({ message: 'File harus diisi', status: 400 });
+  // }
 
   const [getRapot] = await query(
     'SELECT rapot_genap_awal FROM rapot_siswa WHERE id_rapot = ?',
     [id_rapot]
   );
 
-  if (getRapot.rapot_genap_awal !== null) {
+  if (req.file && getRapot.rapot_genap_awal !== null) {
+    try {
+      const img = path.relative('files', getRapot.rapot_genap_awal);
+      const filePath = path.resolve(__dirname, '..', 'public', 'files', img);
+      fs.unlinkSync(filePath);
+    } catch (error) {
+      return res.status(500).json({ message: 'Error', status: 500 });
+    }
+  } else if (
+    !file &&
+    req.file == undefined &&
+    getRapot.rapot_genap_awal !== null
+  ) {
     try {
       const img = path.relative('files', getRapot.rapot_genap_awal);
       const filePath = path.resolve(__dirname, '..', 'public', 'files', img);
@@ -298,14 +338,13 @@ const uploadRapotGenapAwal = async (req, res) => {
     }
   }
 
-  const filePath = req.file.path;
-  const rapot_genap_awal = path
-    .relative('public', filePath)
-    .replace(/\\/g, '/');
+  const filePath = req.file && req.file.path;
+  const rapot_genap_awal =
+    req.file && path.relative('public', filePath).replace(/\\/g, '/');
 
   const statement = await query(
     'UPDATE rapot_siswa SET rapot_genap_awal = ? WHERE id_rapot = ?',
-    [rapot_genap_awal, id_rapot]
+    [file ? file : req.file == undefined ? null : rapot_genap_awal, id_rapot]
   );
 
   try {
@@ -324,22 +363,35 @@ const uploadRapotGenapAwal = async (req, res) => {
 };
 
 const uploadRapotGenapAkhir = async (req, res) => {
-  const { id_rapot } = req.body;
+  const { id_rapot, file } = req.body;
 
   if (req.fileValidationError) {
     return res
       .status(400)
       .json({ message: req.fileValidationError.message, status: 400 });
-  } else if (!req.file) {
-    return res.status(400).json({ message: 'File harus diisi', status: 400 });
   }
+  // else if (!req.file) {
+  //   return res.status(400).json({ message: 'File harus diisi', status: 400 });
+  // }
 
   const [getRapot] = await query(
     'SELECT rapot_genap_akhir FROM rapot_siswa WHERE id_rapot = ?',
     [id_rapot]
   );
 
-  if (getRapot.rapot_genap_akhir !== null) {
+  if (req.file && getRapot.rapot_genap_akhir !== null) {
+    try {
+      const img = path.relative('files', getRapot.rapot_genap_akhir);
+      const filePath = path.resolve(__dirname, '..', 'public', 'files', img);
+      fs.unlinkSync(filePath);
+    } catch (error) {
+      return res.status(500).json({ message: 'Error', status: 500 });
+    }
+  } else if (
+    !file &&
+    req.file == undefined &&
+    getRapot.rapot_genap_akhir !== null
+  ) {
     try {
       const img = path.relative('files', getRapot.rapot_genap_akhir);
       const filePath = path.resolve(__dirname, '..', 'public', 'files', img);
@@ -349,14 +401,13 @@ const uploadRapotGenapAkhir = async (req, res) => {
     }
   }
 
-  const filePath = req.file.path;
-  const rapot_genap_akhir = path
-    .relative('public', filePath)
-    .replace(/\\/g, '/');
+  const filePath = req.file && req.file.path;
+  const rapot_genap_akhir =
+    req.file && path.relative('public', filePath).replace(/\\/g, '/');
 
   const statement = await query(
     'UPDATE rapot_siswa SET rapot_genap_akhir = ? WHERE id_rapot = ?',
-    [rapot_genap_akhir, id_rapot]
+    [file ? file : req.file == undefined ? null : rapot_genap_akhir, id_rapot]
   );
 
   try {
