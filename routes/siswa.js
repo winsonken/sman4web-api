@@ -10,6 +10,7 @@ const {
   deleteSiswa,
   updateSetAktif,
   updateSetJurusan,
+  updateSetAlumni,
 } = require('../controllers/siswa');
 
 const { uploadImage } = require('../middleware/upload');
@@ -23,7 +24,8 @@ app.get('/siswa/belum-ada-kelas', getSiswaBelumAdaKelas);
 app.post('/siswa', uploadImage, createSiswa);
 app.put('/siswa', uploadImage, updateSiswa);
 app.delete('/siswa/:id', deleteSiswa);
-app.post('/siswa/set-aktif', updateSetAktif);
-app.post('/siswa/set-jurusan', updateSetJurusan);
+app.patch('/siswa/set-aktif', updateSetAktif);
+app.patch('/siswa/set-jurusan', updateSetJurusan);
+app.patch('/siswa/set-alumni', updateSetAlumni);
 
 module.exports = app;

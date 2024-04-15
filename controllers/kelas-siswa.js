@@ -144,7 +144,7 @@ const createKelasSiswa = async (req, res) => {
 };
 
 const updateKelasSiswa = async (req, res) => {
-  const { id_kelas_siswa, no_absen, status_kelas_siswa } = req.body;
+  const { id_kelas_siswa, kelas, no_absen, status_kelas_siswa } = req.body;
   const status_tahun_ajaran = 1;
 
   if (status_kelas_siswa === '') {
@@ -170,8 +170,8 @@ const updateKelasSiswa = async (req, res) => {
   }
 
   const statement = await query(
-    'UPDATE kelas_siswa SET no_absen = ?, status_kelas_siswa = ? WHERE id_kelas_siswa = ?',
-    [no_absen, status_kelas_siswa, id_kelas_siswa]
+    'UPDATE kelas_siswa SET kelas = ?, no_absen = ?, status_kelas_siswa = ? WHERE id_kelas_siswa = ?',
+    [kelas, no_absen, status_kelas_siswa, id_kelas_siswa]
   );
 
   try {

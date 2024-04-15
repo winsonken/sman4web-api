@@ -800,6 +800,47 @@ const updateSetJurusan = async (req, res) => {
   }
 };
 
+const updateSetAlumni = async (req, res) => {
+  const statusAlumni = 3;
+  const statusLulus = 2;
+  const statusAngkatan = 2;
+
+  // const [getAngkatan] = await query(
+  //   'SELECT angkatan FROM siswa LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan WHERE status_siswa = ? AND status_angkatan = ?',
+  //   [statusBaru, statusAngkatan]
+  // );
+
+  const statement = await query(
+    `UPDATE siswa LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan SET status_siswa = ? WHERE status_siswa = ? AND status_angkatan = ?`,
+    [statusAlumni, statusLulus, statusAngkatan]
+  );
+
+  // const [getJumlahSiswa] = await query(
+  //   'SELECT COUNT(id_siswa) AS jumlah_siswa FROM siswa WHERE status_siswa = ? AND angkatan = ?',
+  //   [statusAktif, getAngkatan?.angkatan]
+  // );
+
+  // const updateJumlahSiswa = await query(
+  //   'UPDATE angkatan SET jumlah_siswa = ? WHERE id_angkatan = ?',
+  //   [getJumlahSiswa.jumlah_siswa, getAngkatan?.angkatan]
+  // );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Tidak ada siswa lulus untuk diubah ke alumni'
+        : `Semua siswa lulus berhasil diubah ke alumni, total siswa: ${result.affectedRows}`;
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
 module.exports = {
   getSiswa,
   getSiswaBaru,
@@ -811,4 +852,5 @@ module.exports = {
   deleteSiswa,
   updateSetAktif,
   updateSetJurusan,
+  updateSetAlumni,
 };
