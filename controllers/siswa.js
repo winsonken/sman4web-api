@@ -841,6 +841,50 @@ const updateSetAlumni = async (req, res) => {
   }
 };
 
+const getJumlahSiswaAktif = async (req, res) => {
+  const statement = await query(
+    `SELECT COUNT(id_siswa) AS jumlah_siswa_aktif FROM siswa WHERE status_siswa = 1`,
+    []
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Tidak ada siswa aktif'
+        : `Jumlah siswa aktif ditemukan`;
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+const getJumlahAlumni = async (req, res) => {
+  const statement = await query(
+    `SELECT COUNT(id_siswa) AS jumlah_alumni FROM siswa WHERE status_siswa = 3`,
+    []
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1 ? 'Tidak ada alumni' : `Jumlah alumni ditemukan`;
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
 module.exports = {
   getSiswa,
   getSiswaBaru,
@@ -853,4 +897,6 @@ module.exports = {
   updateSetAktif,
   updateSetJurusan,
   updateSetAlumni,
+  getJumlahSiswaAktif,
+  getJumlahAlumni,
 };

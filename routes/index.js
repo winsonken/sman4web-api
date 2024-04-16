@@ -18,6 +18,7 @@ const rapotSiswa = require('./rapot-siswa');
 const modul = require('./modul');
 const role = require('./role');
 const modulUser = require('./modul-user');
+const profile = require('./profile');
 
 const api = '/api/v1';
 app.use(api, auth);
@@ -36,5 +37,6 @@ app.use(api, verifyToken, rapotSiswa);
 app.use(api, verifyToken, modul);
 app.use(api, verifyToken, role);
 app.use(api, verifyToken, modulUser);
+app.use(api, verifyToken, profile);
 
 module.exports = app;

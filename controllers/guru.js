@@ -396,4 +396,33 @@ const deleteGuru = async (req, res) => {
   }
 };
 
-module.exports = { getGuru, createGuru, updateGuru, deleteGuru };
+const getJumlahGuruAktif = async (req, res) => {
+  const statement = await query(
+    `SELECT COUNT(id_guru) AS jumlah_guru_aktif FROM guru WHERE status_guru = 1`,
+    []
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Tidak ada guru aktif'
+        : `Jumlah guru aktif ditemukan`;
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+module.exports = {
+  getGuru,
+  createGuru,
+  updateGuru,
+  deleteGuru,
+  getJumlahGuruAktif,
+};

@@ -9,6 +9,7 @@ const {
   updateLulusAngkatan,
   updateJumlahSiswa,
   updateSiswaLulus,
+  getJumlahAngkatan,
 } = require('../controllers/angkatan');
 
 const app = express();
@@ -23,5 +24,6 @@ app.patch('/angkatan/mulai-angkatan', updateMulaiAngkatan);
 app.patch('/angkatan/lulus-angkatan', updateLulusAngkatan);
 app.patch('/angkatan/jumlah-siswa', updateJumlahSiswa);
 app.patch('/angkatan/siswa-lulus', updateSiswaLulus);
+app.get('/angkatan/jumlah-angkatan', getJumlahAngkatan);
 
 module.exports = app;

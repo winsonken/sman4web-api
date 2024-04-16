@@ -11,6 +11,8 @@ const {
   updateSetAktif,
   updateSetJurusan,
   updateSetAlumni,
+  getJumlahSiswaAktif,
+  getJumlahAlumni,
 } = require('../controllers/siswa');
 
 const { uploadImage } = require('../middleware/upload');
@@ -27,5 +29,7 @@ app.delete('/siswa/:id', deleteSiswa);
 app.patch('/siswa/set-aktif', updateSetAktif);
 app.patch('/siswa/set-jurusan', updateSetJurusan);
 app.patch('/siswa/set-alumni', updateSetAlumni);
+app.get('/siswa/jumlah-siswa-aktif', getJumlahSiswaAktif);
+app.get('/siswa/jumlah-alumni', getJumlahAlumni);
 
 module.exports = app;

@@ -130,7 +130,7 @@ const login = async (req, res) => {
   const siswaData =
     statementSiswa.length > 0 &&
     (await query(
-      'SELECT id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, jurusan, username, nama_role AS role FROM siswa LEFT JOIN role ON role.id_role = siswa.role WHERE id_siswa = ?',
+      'SELECT id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, angkatan.no_angkatan, jurusan, jurusan.nama_jurusan, username, nama_role AS role FROM siswa LEFT JOIN role ON role.id_role = siswa.role LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan LEFT JOIN jurusan ON siswa.jurusan = jurusan.id_jurusan WHERE id_siswa = ?',
       [statement.id_siswa]
     ));
 

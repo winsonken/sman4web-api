@@ -374,6 +374,29 @@ const updateSiswaLulus = async (req, res) => {
   }
 };
 
+const getJumlahAngkatan = async (req, res) => {
+  const statement = await query(
+    `SELECT COUNT(id_angkatan) AS jumlah_angkatan FROM angkatan`,
+    []
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Tidak ada angkatan'
+        : `Jumlah angkatan ditemukan`;
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
 module.exports = {
   getAngkatan,
   getAngkatanLulus,
@@ -384,4 +407,5 @@ module.exports = {
   updateLulusAngkatan,
   updateJumlahSiswa,
   updateSiswaLulus,
+  getJumlahAngkatan,
 };
