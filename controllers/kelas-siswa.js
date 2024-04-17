@@ -283,7 +283,7 @@ const updateLulus = async (req, res) => {
   const statusLulus = 4;
 
   const [getSiswa] = await query(
-    'SELECT siswa FROM kelas_siswa WHERE id_kelas_siswa = ?',
+    'SELECT siswa, siswa.angkatan FROM kelas_siswa LEFT JOIN siswa ON kelas_siswa.siswa = siswa.id_siswa WHERE id_kelas_siswa = ?',
     [id_kelas_siswa]
   );
 
@@ -295,6 +295,18 @@ const updateLulus = async (req, res) => {
   statement.affectedRows > 0 &&
     (await query('UPDATE siswa SET status_siswa = 2 WHERE id_siswa = ?', [
       getSiswa?.siswa,
+    ]));
+
+  const [siswaLulus] = await query(
+    'SELECT COUNT(id_siswa) AS jumlah_siswa_lulus FROM siswa WHERE status_siswa = 2 OR status_siswa = 3 AND angkatan = ?',
+    [getSiswa?.angkatan]
+  );
+
+  const updateJumlahSiswaLulus =
+    statement.affectedRows > 0 &&
+    (await query('UPDATE angkatan SET siswa_lulus = ? WHERE id_angkatan = ?', [
+      siswaLulus?.jumlah_siswa_lulus,
+      getSiswa?.angkatan,
     ]));
 
   try {
