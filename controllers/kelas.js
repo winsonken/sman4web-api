@@ -23,7 +23,7 @@ const getKelas = async (req, res) => {
   };
 
   const statement = await query(
-    'SELECT id_kelas, kelas, nama_kelas, guru.id_guru, guru.nama AS walikelas, jurusan, jurusan.nama_jurusan, angkatan, angkatan.no_angkatan, tahun_ajaran, tahun_ajaran.tahun_mulai_ajaran, tahun_ajaran.tahun_akhir_ajaran FROM kelas LEFT JOIN guru ON kelas.walikelas = guru.id_guru LEFT JOIN jurusan ON kelas.jurusan = jurusan.id_jurusan LEFT JOIN angkatan ON kelas.angkatan = angkatan.id_angkatan LEFT JOIN tahun_ajaran ON kelas.tahun_ajaran = tahun_ajaran.id_tahun_ajaran ORDER BY kelas ASC, nama_kelas ASC',
+    'SELECT id_kelas, kelas, nama_kelas, guru.id_guru, guru.nama AS walikelas, jurusan, jurusan.nama_jurusan, angkatan, angkatan.no_angkatan, tahun_ajaran, tahun_ajaran.tahun_mulai_ajaran, tahun_ajaran.tahun_akhir_ajaran, status_kelas FROM kelas LEFT JOIN guru ON kelas.walikelas = guru.id_guru LEFT JOIN jurusan ON kelas.jurusan = jurusan.id_jurusan LEFT JOIN angkatan ON kelas.angkatan = angkatan.id_angkatan LEFT JOIN tahun_ajaran ON kelas.tahun_ajaran = tahun_ajaran.id_tahun_ajaran ORDER BY kelas ASC, nama_kelas ASC',
     []
   );
 
@@ -64,6 +64,7 @@ const createKelas = async (req, res) => {
   const { kelas, nama_kelas, walikelas, jurusan, angkatan, tahun_ajaran } =
     req.body;
 
+  const status_kelas = 0;
   const id_kelas = idGenerator();
 
   if (
@@ -113,7 +114,7 @@ const createKelas = async (req, res) => {
   }
 
   const statement = await query(
-    'INSERT INTO kelas (id_kelas, kelas, nama_kelas, walikelas, jurusan, angkatan, tahun_ajaran) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    'INSERT INTO kelas (id_kelas, kelas, nama_kelas, walikelas, jurusan, angkatan, tahun_ajaran, status_kelas) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
     [
       id_kelas,
       kelas,
@@ -122,6 +123,7 @@ const createKelas = async (req, res) => {
       jurusan || null,
       angkatan,
       tahun_ajaran,
+      status_kelas,
     ]
   );
 
@@ -152,6 +154,7 @@ const updateKelas = async (req, res) => {
     jurusan,
     angkatan,
     tahun_ajaran,
+    status_kelas,
   } = req.body;
 
   if (
@@ -172,6 +175,8 @@ const updateKelas = async (req, res) => {
         ? 'Angkatan harus diisi'
         : tahun_ajaran === ''
         ? 'Tahun ajaran harus diisi'
+        : status_kelas === ''
+        ? 'Status kelas harus diisi'
         : '';
     return res.status(400).json({ message: message, status: 400 });
   }
@@ -189,7 +194,7 @@ const updateKelas = async (req, res) => {
   }
 
   const statement = await query(
-    'UPDATE kelas SET kelas = ?, nama_kelas = ?, walikelas = ?, jurusan = ?, angkatan = ?, tahun_ajaran = ? WHERE id_kelas = ?',
+    'UPDATE kelas SET kelas = ?, nama_kelas = ?, walikelas = ?, jurusan = ?, angkatan = ?, tahun_ajaran = ?, status_kelas = ? WHERE id_kelas = ?',
     [
       kelas,
       nama_kelas,
@@ -197,6 +202,7 @@ const updateKelas = async (req, res) => {
       jurusan || null,
       angkatan,
       tahun_ajaran,
+      status_kelas,
       id_kelas,
     ]
   );
@@ -237,9 +243,61 @@ const deleteKelas = async (req, res) => {
   }
 };
 
+const updateKelasMulai = async (req, res) => {
+  const { id_kelas } = req.body;
+  const statusMulaiKelas = 1;
+
+  const statement = await query(
+    `UPDATE kelas SET status_kelas = ? WHERE id_kelas = ?`,
+    [statusMulaiKelas, id_kelas]
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Kelas gagal dimulai'
+        : 'Kelas berhasil dimulai';
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
+const updateKelasBerakhir = async (req, res) => {
+  const { id_kelas } = req.body;
+  const statusBerakhirKelas = 2;
+
+  const statement = await query(
+    `UPDATE kelas SET status_kelas = ? WHERE id_kelas = ?`,
+    [statusBerakhirKelas, id_kelas]
+  );
+
+  try {
+    const result = statement;
+    const message =
+      result.affectedRows < 1
+        ? 'Kelas gagal diakhiri'
+        : 'Kelas berhasil diakhiri';
+    const status = result.affectedRows < 1 ? 400 : 200;
+    return res.status(status).json({
+      message: message,
+      status: status,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Internal error', status: 500 });
+  }
+};
+
 module.exports = {
   getKelas,
   createKelas,
   updateKelas,
   deleteKelas,
+  updateKelasMulai,
+  updateKelasBerakhir,
 };
