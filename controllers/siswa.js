@@ -804,6 +804,13 @@ const updateSetAlumni = async (req, res) => {
   const statusAlumni = 3;
   const statusLulus = 2;
   const statusAngkatan = 2;
+  const namaRole = 'alumni';
+
+  const [getAlumniRole] = await query(
+    'SELECT id_role FROM role WHERE nama_role = ?',
+    [namaRole]
+  );
+  const roleAlumni = getAlumniRole?.id_role;
 
   // const [getAngkatan] = await query(
   //   'SELECT angkatan FROM siswa LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan WHERE status_siswa = ? AND status_angkatan = ?',
@@ -811,8 +818,8 @@ const updateSetAlumni = async (req, res) => {
   // );
 
   const statement = await query(
-    `UPDATE siswa LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan SET status_siswa = ? WHERE status_siswa = ? AND status_angkatan = ?`,
-    [statusAlumni, statusLulus, statusAngkatan]
+    `UPDATE siswa LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan SET status_siswa = ?, role = ? WHERE status_siswa = ? AND status_angkatan = ?`,
+    [statusAlumni, roleAlumni, statusLulus, statusAngkatan]
   );
 
   // const [getJumlahSiswa] = await query(
