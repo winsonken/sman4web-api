@@ -93,8 +93,8 @@ const createKelasSiswa = async (req, res) => {
 
   // Jika siswa sudah terdaftar ke dalam kelas di tahun ajaran yang aktif
   const checkKelasDuplicate = await query(
-    'SELECT id_kelas_siswa FROM kelas_siswa LEFT JOIN kelas ON kelas_siswa.kelas = kelas.id_kelas LEFT JOIN tahun_ajaran ON kelas.tahun_ajaran = tahun_ajaran.id_tahun_ajaran WHERE siswa = ? AND id_tahun_ajaran = ? AND status_tahun_ajaran = ?',
-    [siswa, tahun_ajaran, status_tahun_ajaran]
+    'SELECT id_kelas_siswa FROM kelas_siswa LEFT JOIN kelas ON kelas_siswa.kelas = kelas.id_kelas LEFT JOIN tahun_ajaran ON kelas.tahun_ajaran = tahun_ajaran.id_tahun_ajaran WHERE siswa = ? AND id_tahun_ajaran = ?',
+    [siswa, tahun_ajaran]
   );
 
   if (checkKelasDuplicate.length > 0) {
