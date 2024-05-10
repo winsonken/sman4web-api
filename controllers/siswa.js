@@ -246,10 +246,15 @@ const getSiswaBelumAdaKelas = async (req, res) => {
     nipd: nipd,
   };
 
+  // const statement = await query(
+  //   'SELECT id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, no_angkatan,  jurusan, username, nama_role AS role FROM siswa LEFT JOIN role ON siswa.role = role.id_role LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan LEFT JOIN kelas_siswa ON siswa.id_siswa = kelas_siswa.siswa WHERE kelas_siswa.siswa IS NULL AND status_siswa = 1',
+  //   []
+  // );
+
   const statement = await query(
-    'SELECT id_siswa, no_pendaftaran, nama, jenis_kelamin, nipd, nik, no_telepon_siswa, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, nama_ortu, no_telepon_ortu, foto, status_siswa, angkatan, no_angkatan,  jurusan, username, nama_role AS role FROM siswa LEFT JOIN role ON siswa.role = role.id_role LEFT JOIN angkatan ON siswa.angkatan = angkatan.id_angkatan LEFT JOIN kelas_siswa ON siswa.id_siswa = kelas_siswa.siswa WHERE kelas_siswa.siswa IS NULL AND status_siswa = 1',
-    []
+    `SELECT * FROM siswa WHERE status_siswa = 1`, []
   );
+ 
 
   const filterParameter = statement.filter((object) =>
     Object.keys(payload).every((key) =>
