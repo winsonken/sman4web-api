@@ -16,7 +16,7 @@ const getKelasSiswa = async (req, res) => {
   const isSiswa = req.userRole == '45cc3b0962e46586971c66b152a8a293';
 
   const payload = {
-    nama_siswa: siswa,
+    siswa: siswa,
     kelas: kelas,
   };
 
@@ -42,7 +42,7 @@ const getKelasSiswa = async (req, res) => {
   );
 
   const filterSearch = filterParameter.filter((object) =>
-    search == '' ? object : object.nama_siswa.toLowerCase().startsWith(search)
+    search == '' ? object : object.siswa.toLowerCase().startsWith(search)
   );
 
   try {
@@ -98,9 +98,10 @@ const createKelasSiswa = async (req, res) => {
   );
 
   if (checkKelasDuplicate.length > 0) {
-    return res
-      .status(400)
-      .json({ message: 'Siswa sudah terdaftar dikelas lain di tahun ajaran ini', status: 400 });
+    return res.status(400).json({
+      message: 'Siswa sudah terdaftar dikelas lain di tahun ajaran ini',
+      status: 400,
+    });
   }
 
   const statement = await query(

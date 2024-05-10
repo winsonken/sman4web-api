@@ -11,6 +11,7 @@ const getTendik = async (req, res) => {
   const nama = req.query.nama || '';
   const no = req.query.no || '';
   const status_kepegawaian = req.query.kepegawaian || '';
+  const status = req.query.status || '';
   const search = req.query.q || '';
   const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
   const limit =
@@ -20,6 +21,7 @@ const getTendik = async (req, res) => {
     nama: nama,
     no_tendik: no,
     status_kepegawaian: status_kepegawaian,
+    status_tendik: status,
   };
 
   const statusAktif = 1;
