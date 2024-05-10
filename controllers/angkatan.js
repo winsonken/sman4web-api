@@ -222,10 +222,16 @@ const updateAngkatan = async (req, res) => {
       .json({ message: 'Angkatan belum dimulai', status: 400 });
   }
 
-  if (
-    checkAngkatan.status_angkatan == 2 &&
-    (status_angkatan == 0 || status_angkatan == 1)
-  ) {
+  // if (
+  //   checkAngkatan.status_angkatan == 2 &&
+  //   (status_angkatan == 0 || status_angkatan == 1)
+  // ) {
+  //   return res
+  //     .status(400)
+  //     .json({ message: 'Angkatan sudah lulus', status: 400 });
+  // }
+
+  if (checkAngkatan.status_angkatan == 2 && status_angkatan == 0) {
     return res
       .status(400)
       .json({ message: 'Angkatan sudah lulus', status: 400 });

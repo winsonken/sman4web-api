@@ -13,6 +13,7 @@ const getGuru = async (req, res) => {
   const nama = req.query.nama || '';
   const no = req.query.no || '';
   const status_kepegawaian = req.query.kepegawaian || '';
+  const status = req.query.status || '';
   const search = req.query.q || '';
   const page = Number(req.query.page) < 1 ? 1 : Number(req.query.page) || 1;
   const limit =
@@ -22,20 +23,19 @@ const getGuru = async (req, res) => {
     nama: nama,
     no_guru: no,
     status_kepegawaian: status_kepegawaian,
+    status_guru: status,
   };
 
   const statusAktif = 1;
 
   const statement = await query(
-    'SELECT id_guru, nama, jenis_kelamin, nik, no_guru, jenis_ptk, no_telepon_guru, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, foto, status_kawin, status_guru, status_kepegawaian, username, nama_role, role FROM guru LEFT JOIN role ON guru.role = role.id_role WHERE status_guru = ?',
-    [statusAktif]
+    'SELECT id_guru, nama, jenis_kelamin, nik, no_guru, jenis_ptk, no_telepon_guru, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, foto, status_kawin, status_guru, status_kepegawaian, username, nama_role, role FROM guru LEFT JOIN role ON guru.role = role.id_role ORDER BY status_guru ASC',
+    []
   );
 
   const filterParameter = statement.filter((object) =>
     Object.keys(payload).every((key) =>
-      payload[key] == ''
-        ? object
-        : object[key].toLowerCase() == payload[key].toLowerCase()
+      payload[key] == '' ? object : object[key] == payload[key]
     )
   );
 

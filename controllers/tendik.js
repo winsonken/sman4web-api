@@ -25,8 +25,8 @@ const getTendik = async (req, res) => {
   const statusAktif = 1;
 
   const statement = await query(
-    'SELECT id_tendik, nama, jenis_kelamin, nik, no_tendik, jenis_ptk, no_telepon_tendik, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, foto, status_kawin, status_tendik, status_kepegawaian, username, nama_role, role FROM tendik LEFT JOIN role ON tendik.role = role.id_role WHERE status_tendik = ?',
-    [statusAktif]
+    'SELECT id_tendik, nama, jenis_kelamin, nik, no_tendik, jenis_ptk, no_telepon_tendik, alamat, email, tempat_lahir, DATE_FORMAT(tanggal_lahir, "%Y-%m-%d") AS tanggal_lahir, agama, foto, status_kawin, status_tendik, status_kepegawaian, username, nama_role, role FROM tendik LEFT JOIN role ON tendik.role = role.id_role ORDER BY status_tendik ASC',
+    []
   );
 
   const filterParameter = statement.filter((object) =>

@@ -4,6 +4,7 @@ const {
   getSiswaBaru,
   getSiswaLulus,
   getSiswaAlumni,
+  getSiswaDropout,
   getSiswaBelumAdaKelas,
   createSiswa,
   updateSiswa,
@@ -23,6 +24,7 @@ app.get('/siswa/baru', getSiswaBaru);
 app.get('/siswa/lulus', getSiswaLulus);
 app.get('/siswa/alumni', getSiswaAlumni);
 app.get('/siswa/belum-ada-kelas', getSiswaBelumAdaKelas);
+app.get('/siswa/dropout', getSiswaDropout);
 app.post('/siswa', uploadImage, createSiswa);
 app.put('/siswa', uploadImage, updateSiswa);
 app.delete('/siswa/:id', deleteSiswa);
