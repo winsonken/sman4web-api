@@ -16,6 +16,7 @@ const getRapotSiswa = async (req, res) => {
     Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
 
   const isSiswa = req.userRole == '45cc3b0962e46586971c66b152a8a293';
+  const isAlumni = req.userRole == '92a2664681ea75e6ede4a6e78e79e765';
 
   const payload = {
     id_siswa: siswa,
@@ -24,7 +25,7 @@ const getRapotSiswa = async (req, res) => {
 
   let statement;
 
-  if (isSiswa) {
+  if (isSiswa || isAlumni) {
     statement = await query(
       'SELECT id_rapot, rapot_ganjil_awal, rapot_ganjil_akhir, rapot_genap_awal, rapot_genap_akhir, siswa.nama AS nama_siswa, siswa.nipd, siswa.id_siswa, tahun_ajaran.tahun_mulai_ajaran, tahun_ajaran.tahun_akhir_ajaran FROM rapot_siswa LEFT JOIN siswa ON rapot_siswa.siswa = siswa.id_siswa LEFT JOIN tahun_ajaran ON rapot_siswa.tahun_ajaran = tahun_ajaran.id_tahun_ajaran WHERE siswa.id_siswa = ? ORDER BY tahun_ajaran.tahun_mulai_ajaran ASC',
       [req.userId]

@@ -14,6 +14,7 @@ const getKelasSiswa = async (req, res) => {
     Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
 
   const isSiswa = req.userRole == '45cc3b0962e46586971c66b152a8a293';
+  const isAlumni = req.userRole == '92a2664681ea75e6ede4a6e78e79e765';
 
   const payload = {
     siswa: siswa,
@@ -21,7 +22,7 @@ const getKelasSiswa = async (req, res) => {
   };
 
   let statement;
-  if (isSiswa) {
+  if (isSiswa || isAlumni) {
     statement = await query(
       'SELECT id_kelas_siswa, no_absen, status_kelas_siswa, kelas_siswa.kelas, kelas.kelas AS no_kelas, kelas.nama_kelas, kelas_siswa.siswa, siswa.jurusan, jurusan.nama_jurusan, siswa.id_siswa, siswa.nama AS nama_siswa, kelas.walikelas, guru.nama AS nama_walikelas, rapot, rapot_siswa.rapot_ganjil_awal, rapot_siswa.rapot_ganjil_akhir, rapot_siswa.rapot_genap_awal, rapot_siswa.rapot_genap_akhir, kelas.tahun_ajaran, tahun_ajaran.tahun_mulai_ajaran, tahun_ajaran.tahun_akhir_ajaran FROM kelas_siswa LEFT JOIN kelas ON kelas_siswa.kelas = kelas.id_kelas LEFT JOIN siswa ON kelas_siswa.siswa = siswa.id_siswa LEFT JOIN rapot_siswa ON kelas_siswa.rapot = rapot_siswa.id_rapot LEFT JOIN guru ON kelas.walikelas = guru.id_guru LEFT JOIN tahun_ajaran ON kelas.tahun_ajaran = tahun_ajaran.id_tahun_ajaran LEFT JOIN jurusan ON kelas.jurusan = jurusan.id_jurusan WHERE siswa.id_siswa = ? ORDER BY no_kelas ASC, no_absen ASC ',
       [req.userId]

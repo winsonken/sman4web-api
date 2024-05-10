@@ -13,6 +13,7 @@ const getPrestasi = async (req, res) => {
     Number(req.query.limit) < 1 ? 10 : Number(req.query.limit) || 10;
 
   const isSiswa = req.userRole == '45cc3b0962e46586971c66b152a8a293';
+  const isAlumni = req.userRole == '92a2664681ea75e6ede4a6e78e79e765';
 
   const payload = {
     id_siswa: siswa,
@@ -24,7 +25,7 @@ const getPrestasi = async (req, res) => {
   // );
 
   let statement;
-  if (isSiswa) {
+  if (isSiswa || isAlumni) {
     statement = await query(
       'SELECT id_prestasi, nama_prestasi, jenis_prestasi, DATE_FORMAT(tanggal_prestasi, "%Y-%m-%d") AS tanggal_prestasi, siswa.nama AS nama_siswa, siswa.id_siswa, siswa.nipd FROM prestasi_siswa LEFT JOIN siswa ON prestasi_siswa.siswa = siswa.id_siswa WHERE siswa.id_siswa = ?',
       [req.userId]
